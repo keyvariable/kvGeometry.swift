@@ -124,7 +124,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     }
 
 
-    /// - Returns: The argument of the canonical equation the receiver and given plane intersect at.
+    /// - Returns: The argument of the receivers equation where the receiverintersect given plane.
     ///
     /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
     @inlinable
@@ -154,7 +154,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         origin += offset
@@ -163,7 +163,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
     /// - Returns: A ray produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(in: direction, at: origin + offset)
@@ -172,7 +172,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         direction *= scale
@@ -182,7 +182,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
     /// - Returns: A ray produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(in: direction * scale, at: AffineTransform(scale: scale) * origin)
@@ -206,13 +206,13 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     /// - Returns: Result of given transformation applied to *rhs*.
     @inlinable
     public static func *(lhs: Transform, rhs: Self) -> Self {
-        .init(in: lhs.act(vector: rhs.direction), at: lhs * rhs.origin)
+        Self(in: lhs.act(vector: rhs.direction), at: lhs * rhs.origin)
     }
 
     /// - Returns: Result of given transformation applied to *rhs*.
     @inlinable
     public static func *(lhs: AffineTransform, rhs: Self) -> Self {
-        .init(in: lhs.act(vector: rhs.direction), at: lhs * rhs.origin)
+        Self(in: lhs.act(vector: rhs.direction), at: lhs * rhs.origin)
     }
 
 }

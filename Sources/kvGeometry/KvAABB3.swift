@@ -151,7 +151,7 @@ public struct KvAABB3<Math : KvMathScope> {
 
     /// Translates the receiver by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         min += offset
@@ -161,13 +161,13 @@ public struct KvAABB3<Math : KvMathScope> {
 
     /// - Returns: An AABB produced applying translation by *offset* to the receiver.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable public func translated(by offset: Vector) -> Self { Self(min: min + offset, max: max + offset) }
 
 
     /// Scales the receiver.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Math.Scalar) {
         switch scale >= 0 {
@@ -184,13 +184,13 @@ public struct KvAABB3<Math : KvMathScope> {
 
     /// Scales the receiver.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable public mutating func scale(by scale: Vector) { self = scaled(by: scale) }
 
 
     /// - Returns: An AABB produced applying scale to the receiver.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Math.Scalar) -> Self {
         scale >= 0 ? Self(min: min * scale, max: max * scale) : Self(min: max * scale, max: min * scale)
@@ -198,7 +198,7 @@ public struct KvAABB3<Math : KvMathScope> {
 
     /// - Returns: An AABB produced applying scale to the receiver.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable public func scaled(by scale: Vector) -> Self { Self(over: min * scale, max * scale) }
 
 

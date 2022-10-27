@@ -261,7 +261,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         c -= Math.dot(normal, offset)
@@ -270,7 +270,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// - Returns: A line produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(normal: normal, c: c - Math.dot(normal, offset))
@@ -279,7 +279,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         c *= scale
@@ -288,7 +288,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// - Returns: A line produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(normal: normal, c: c * scale)
@@ -297,7 +297,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// Rotates all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func rotate(by angle: Scalar) {
         normal = AffineTransform(angle: angle).act(normal: normal)
@@ -306,7 +306,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// - Returns: A line produced applying rotation to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func rotated(by angle: Scalar) -> Self {
         Self(normal: AffineTransform(angle: angle).act(normal: normal), c: c)

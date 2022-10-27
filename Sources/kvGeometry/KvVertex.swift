@@ -89,6 +89,9 @@ public protocol KvVertexProtocol {
 
 extension KvVertexProtocol {
 
+    /// - Returns: Copy of the receiver having opposite orientation.
+    ///
+    /// Usually the normal or tangent space have to be inverted.
     @inlinable
     public func flipped() -> Self {
         var v = clone()
@@ -97,6 +100,7 @@ extension KvVertexProtocol {
     }
 
 
+    /// - Returns: Linear interpolation of the receiver and other vertex.
     @inlinable
     public func mixed(_ rhs: Self, t: Math.Scalar) -> Self {
         var v = clone()

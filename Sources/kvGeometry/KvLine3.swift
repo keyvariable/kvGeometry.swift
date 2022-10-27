@@ -146,13 +146,13 @@ public struct KvLine3<Math : KvMathScope> {
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable public mutating func translate(by offset: Vector) { self = translated(by: offset) }
 
 
     /// - Returns: A line produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(in: front, at: anyCoordinate + offset)
@@ -161,7 +161,7 @@ public struct KvLine3<Math : KvMathScope> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         d *= scale
@@ -170,7 +170,7 @@ public struct KvLine3<Math : KvMathScope> {
 
     /// - Returns: A line produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(quaternion: quaternion, d: d * scale)

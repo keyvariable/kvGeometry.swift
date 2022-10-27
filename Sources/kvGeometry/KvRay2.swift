@@ -217,7 +217,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         origin += offset
@@ -226,7 +226,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
     /// - Returns: A ray produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(in: direction, at: origin + offset)
@@ -235,7 +235,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         direction *= scale
@@ -245,7 +245,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
     /// - Returns: A ray produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(in: direction * scale, at: AffineTransform(scale: scale) * origin)

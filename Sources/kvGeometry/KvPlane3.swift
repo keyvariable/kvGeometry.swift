@@ -286,7 +286,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         d -= Math.dot(normal, offset)
@@ -295,7 +295,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// - Returns: A plane produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(normal: normal, d: d - Math.dot(normal, offset))
@@ -304,7 +304,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// Translates all the receiver's ponts by *offset* · *normal*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Scalar) {
         d -= offset
@@ -313,7 +313,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// - Returns: A plane produced applying translation by *offset* · *normal* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Scalar) -> Self {
         Self(normal: normal, d: d - offset)
@@ -322,7 +322,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         d *= scale
@@ -331,7 +331,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// - Returns: A plane produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(normal: normal, d: d * scale)
