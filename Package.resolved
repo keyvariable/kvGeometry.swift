@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "kvKit-Swift",
+        "repositoryURL": "https://github.com/keyvariable/kvKit-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "1661bc8505c84f9da19d513ac9f6ffc4b231c314",
+          "version": "3.1.0-a.50"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
