@@ -86,7 +86,7 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable
     public init<V>(_ ray: KvRay2<V>)
     where V : KvVertex2Protocol, V.Math == Math {
-        self.init(in: ray.direction, at: ray.origin.coordinate)
+        self.init(in: ray.front, at: ray.origin.coordinate)
     }
 
 
@@ -189,7 +189,7 @@ public struct KvLine2<Math : KvMathScope> {
     where V : KvVertex2Protocol, V.Math == Math
     {
         contains(ray.origin.coordinate)
-        && KvIsZero(Math.dot(normal, ray.direction), eps: Math.epsArg(normal).dot(Math.epsArg(ray.direction)).tolerance)
+        && KvIsZero(Math.dot(normal, ray.front), eps: Math.epsArg(normal).dot(Math.epsArg(ray.front)).tolerance)
     }
 
 

@@ -78,7 +78,7 @@ public struct KvLine3<Math : KvMathScope> {
     public init<V>(_ ray: KvRay3<V>)
     where V : KvVertex3Protocol, V.Math == Math
     {
-        self.init(in: ray.direction, at: ray.origin.coordinate)
+        self.init(in: ray.front, at: ray.origin.coordinate)
     }
 
 

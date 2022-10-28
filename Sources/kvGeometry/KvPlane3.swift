@@ -166,13 +166,11 @@ public struct KvPlane3<Math : KvMathScope> {
 
 
     /// Alias to ``at``(method).
-    @inlinable
-    public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
+    @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 
     /// - Returns: The distance from the receiver to *x* divided by length of the normal.
-    @inlinable
-    public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
+    @inlinable public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
 
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
@@ -184,8 +182,8 @@ public struct KvPlane3<Math : KvMathScope> {
     where V : KvVertex3Protocol, V.Math == Math
     {
         contains(ray.origin.coordinate)
-        && KvIsZero(Math.dot(normal, ray.direction),
-                    eps: Math.epsArg(normal).dot(Math.epsArg(ray.direction)).tolerance)
+        && KvIsZero(Math.dot(normal, ray.front),
+                    eps: Math.epsArg(normal).dot(Math.epsArg(ray.front)).tolerance)
     }
 
     /// - Returns: A boolean value indicating whether the receiver contains given line.
