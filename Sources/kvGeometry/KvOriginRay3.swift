@@ -15,35 +15,29 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  KvRay3.swift
+//  KvOriginRay3.swift
 //  kvGeometry
 //
-//  Created by Svyatoslav Popov on 24.09.2022.
+//  Created by Svyatoslav Popov on 28.10.2022.
 //
 
 import kvKit
 
 
 
-/// Implementation of a ray in 3D coordinate space.
-///
-/// See ``KvOriginRay3``.
-public struct KvRay3<Vertex : KvVertex3Protocol> {
+/// Implementation of a ray from the coordinate origin in 3D coordinate space. It's faster than ``KvRay3``.
+public struct KvOriginRay3<Math : KvMathScope> {
 
-    public typealias Math = Vertex.Math
-    public typealias Vertex = Vertex
+    public typealias Math = Math
 
     public typealias Scalar = Math.Scalar
     public typealias Vector = Math.Vector3
+    public typealias Coordinate = Math.Vector3
 
-    public typealias Transform = KvTransform3<Math>
     public typealias AffineTransform = KvAffineTransform3<Math>
 
 
-
-    /// A vertex the ray starts at.
-    public var origin: Vertex
-    /// Direction vector of the ray.
+    /// Direction vector of the receiver.
     public var front: Vector
 
 
@@ -52,19 +46,10 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     ///
     /// - Note: The caller is responsible for clonning provided origin.
     @inlinable
-    public init(in front: Vector, at origin: Vertex) {
-        KvDebug.assert(Math.isNonzero(front), "Invalid argument: front of a ray is a zero vector")
+    public init(in front: Vector) {
+        KvDebug.assert(Math.isNonzero(front), "Invalid argument: front of an origin ray is a zero vector")
 
-        self.origin = origin
         self.front = front
-    }
-
-
-    /// - Note: Target is not an instance of *Vertex* to preserve unambiguity in some cases.
-    /// - Note: The caller is responsible for clonning provided origin.
-    @inlinable
-    public init(from origin: Vertex, to target: Vertex.Coordinate) {
-        self.init(in: target - origin.coordinate, at: origin)
     }
 
 
@@ -75,24 +60,12 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     @inlinable public var isDegenerate: Bool { Math.isZero(front) }
 
 
-    /// - Returns: *origin* + *front* · *t*.
-    @inlinable public func at(_ t: Scalar) -> Vertex { origin + front * t }
+    /// - Returns: *front* · *t*.
+    @inlinable public func at(_ t: Scalar) -> Coordinate { front * t }
 
 
-    /// Inverses the direction preserving the origin.
+    /// Inverses the direction.
     @inlinable public mutating func negate() { front = -front }
-
-
-    /// - Returns: Copy of the receiver where vertices are cloned.
-    @inlinable public func clone() -> Self { Self(in: front, at: origin.clone()) }
-
-
-    /// Flips the origin preserving the direction.
-    @inlinable public mutating func flip() { origin.flip() }
-
-
-    /// - Returns: A ray having the same direction but flipped origin.
-    @inlinable public func flipped() -> Self { Self(in: front, at: origin.flipped()) }
 
 
     /// Normalizes the receiver's direction.
@@ -105,7 +78,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     /// Normalizes the receiver's direction if it isn't a zero vector.
     @inlinable
     public func normalized() -> Self {
-        Self(in: Math.normalize(front), at: origin.clone())
+        Self(in: Math.normalize(front))
     }
 
 
@@ -121,7 +94,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     /// - Returns: A ray matching the receiver but having unit direction when the receiver's direction isn't a zero vector.
     @inlinable
     public func safeNormalized() -> Self? {
-        Math.safeNormalize(front).map { Self(in: $0, at: origin.clone()) }
+        Math.safeNormalize(front).map { Self.init(in: $0) }
     }
 
 
@@ -134,7 +107,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
         guard KvIsNonzero(divider) else { return nil }
 
-        let t = -plane.at(origin.coordinate) / divider
+        let t = -plane.d / divider
 
         guard KvIsNotNegative(t) else { return nil }
 
@@ -148,26 +121,8 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
     /// - Returns: A copy of the origin translated to coordinate where the receiver and given plane intersect.
     @inlinable
-    public func intersection(with plane: KvPlane3<Math>) -> Vertex? {
+    public func intersection(with plane: KvPlane3<Math>) -> Coordinate? {
         offset(to: plane).map(self.at(_:))
-    }
-
-
-    /// Translates all the receiver's ponts by *offset*.
-    ///
-    /// - Note: It's faster then apply an arbitrary transformation.
-    @inlinable
-    public mutating func translate(by offset: Vector) {
-        origin += offset
-    }
-
-
-    /// - Returns: A ray produced applying translation by *offset* to all the receiver's ponts.
-    ///
-    /// - Note: It's faster then apply an arbitrary transformation.
-    @inlinable
-    public func translated(by offset: Vector) -> Self {
-        Self(in: front, at: origin + offset)
     }
 
 
@@ -177,7 +132,6 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     @inlinable
     public mutating func scale(by scale: Scalar) {
         front *= scale
-        origin.apply(AffineTransform(scale: scale))
     }
 
 
@@ -186,12 +140,9 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
-        Self(in: front * scale, at: AffineTransform(scale: scale) * origin)
+        Self(in: front * scale)
     }
 
-
-    /// Applies given transformation to all the receiver's points.
-    @inlinable public mutating func apply(_ t: Transform) { self = t * self }
 
     /// Applies given transformation to all the receiver's points.
     @inlinable public mutating func apply(_ t: AffineTransform) { self = t * self }
@@ -201,19 +152,13 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     // MARK: Operators
 
     /// - Returns: A ray with the same origin but opposite direction.
-    @inlinable public static prefix func -(rhs: Self) -> Self { Self(in: -rhs.front, at: rhs.origin.clone()) }
+    @inlinable public static prefix func -(rhs: Self) -> Self { Self(in: -rhs.front) }
 
-
-    /// - Returns: Result of given transformation applied to *rhs*.
-    @inlinable
-    public static func *(lhs: Transform, rhs: Self) -> Self {
-        Self(in: lhs.act(vector: rhs.front), at: lhs * rhs.origin)
-    }
 
     /// - Returns: Result of given transformation applied to *rhs*.
     @inlinable
     public static func *(lhs: AffineTransform, rhs: Self) -> Self {
-        Self(in: lhs.act(vector: rhs.front), at: lhs * rhs.origin)
+        Self(in: lhs.act(vector: rhs.front))
     }
 
 }
@@ -222,20 +167,21 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
 
 // MARK: : KvNumericallyEquatable
 
-extension KvRay3 : KvNumericallyEquatable where Vertex : KvNumericallyEquatable {
+extension KvOriginRay3 : KvNumericallyEquatable {
 
     /// - Returns: A boolean value indicating whether the receiver and *rhs* are numerically equal.
     @inlinable
     public func isEqual(to rhs: Self) -> Bool {
-        Math.isEqual(origin.coordinate, rhs.origin.coordinate) && Math.isCoDirectional(front, rhs.front)
+        Math.isCoDirectional(front, rhs.front)
     }
+
 
     /// - Returns: A boolean value indicating whether the receiver and *rhs* are numerically equal.
     @inlinable
     public func isEqual<V>(to rhs: KvRay3<V>) -> Bool
-    where V : KvVertex3Protocol, V.Math == Vertex.Math
+    where V : KvVertex3Protocol, V.Math == Math
     {
-        Math.isEqual(origin.coordinate, rhs.origin.coordinate) && Math.isCoDirectional(front, rhs.front)
+        Math.isZero(rhs.origin.coordinate) && Math.isCoDirectional(front, rhs.front)
     }
 
 }
@@ -244,11 +190,10 @@ extension KvRay3 : KvNumericallyEquatable where Vertex : KvNumericallyEquatable 
 
 // MARK: : Equatable
 
-extension KvRay3 : Equatable where Vertex : Equatable { }
+extension KvOriginRay3 : Equatable { }
 
 
 
 // MARK: : Hashable
 
-extension KvRay3 : Hashable where Vertex : Hashable { }
-
+extension KvOriginRay3 : Hashable { }
