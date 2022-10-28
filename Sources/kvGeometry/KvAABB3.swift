@@ -149,6 +149,36 @@ public struct KvAABB3<Math : KvMathScope> {
     }
 
 
+    /// - Returns: A minimum box containing the receiver and given coordinate.
+    ///
+    /// See ``union(_:)-6njh1``, ``formUnion(_:)-73hqs``.
+    @inlinable public func union(_ c: Coordinate) -> Self { Self(min: Math.min(min, c), max: Math.max(max, c)) }
+
+    /// - Returns: A minimum box containing the receiver and given coordinate.
+    ///
+    /// See ``union(_:)-9yczk``, ``formUnion(_:)-9mhc``.
+    @inlinable public func union(_ box: Self) -> Self { Self(min: Math.min(min, box.min), max: Math.max(max, box.max)) }
+
+
+    /// - Returns: A minimum box containing the receiver and given coordinate.
+    ///
+    /// See ``formUnion(_:)-9mhc``, ``union(_:)-9yczk``.
+    @inlinable
+    public mutating func formUnion(_ c: Coordinate) {
+        min = Math.min(min, c)
+        max = Math.max(max, c)
+    }
+
+    /// - Returns: A minimum box containing the receiver and given box.
+    ///
+    /// See ``formUnion(_:)-73hqs``, ``union(_:)-6njh1``.
+    @inlinable
+    public mutating func formUnion(_ box: Self) {
+        min = Math.min(min, box.min)
+        max = Math.max(max, box.max)
+    }
+
+
     /// Translates the receiver by *offset*.
     ///
     /// - Note: It's faster then apply an arbitrary transformation.
