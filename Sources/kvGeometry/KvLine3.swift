@@ -168,6 +168,13 @@ public struct KvLine3<Math : KvMathScope> {
         Math.length(Math.cross(x - closestToOrigin, front))
     }
 
+    /// - Returns: The distance from the receiver to given vertex.
+    @inlinable
+    public func offset<V>(to v: V) -> Scalar
+    where V : KvVertex3Protocol, V.Math == Math {
+        offset(to: v.coordinate)
+    }
+
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
     @inlinable
@@ -175,6 +182,13 @@ public struct KvLine3<Math : KvMathScope> {
         let c = c - closestToOrigin
         return Math.isZero(Math.cross(front, c),
                            eps: Math.epsArg(front).cross(Math.epsArg(c)).tolerance)
+    }
+
+    /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
+    @inlinable
+    public func contains<V>(_ v: V) -> Bool
+    where V : KvVertex3Protocol, V.Math == Math {
+        contains(v.coordinate)
     }
 
 
