@@ -73,6 +73,16 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable public init(_ c0: Coordinate, _ c1: Coordinate) { self.init(in: c1 - c0, at: c0) }
 
 
+    /// A line containing both *v0* and *v1* vertices.
+    ///
+    /// - Note: Resulting line is degenerate when coordinates of *v0* and *v1* are equal.
+    @inlinable
+    public init<V0, V1>(_ v0: V0, _ v1: V1)
+    where V0 : KvVertex2Protocol, V0.Math == Math, V1 : KvVertex2Protocol, V1.Math == Math {
+        self.init(in: v1.coordinate - v0.coordinate, at: v0)
+    }
+
+
     @inlinable
     public init<V>(_ ray: KvRay2<V>)
     where V : KvVertex2Protocol, V.Math == Math {
@@ -87,6 +97,14 @@ public struct KvLine2<Math : KvMathScope> {
     }
 
 
+    /// A line having given direction and containing given coordinate.
+    @inlinable
+    public init<V>(in direction: Vector, at vertex: V)
+    where V : KvVertex2Protocol, V.Math == Math {
+        self.init(normal: Vector(x: -direction.y, y: direction.x), at: vertex.coordinate)
+    }
+
+
     /// A line having given direction and distance to coordinate origin.
     @inlinable
     public init(in direction: Vector, c: Scalar) {
@@ -98,6 +116,14 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable
     public init(normal: Vector, at coordinate: Coordinate) {
         self.init(normal: normal, c: -Math.dot(coordinate, normal))
+    }
+
+
+    /// A line having given normal and containing given coordinate.
+    @inlinable
+    public init<V>(normal: Vector, at vertex: V)
+    where V : KvVertex2Protocol, V.Math == Math {
+        self.init(normal: normal, c: -Math.dot(vertex.coordinate, normal))
     }
 
 

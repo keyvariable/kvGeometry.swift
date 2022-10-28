@@ -76,10 +76,28 @@ public struct KvPlane3<Math : KvMathScope> {
     }
 
 
+    // A plane containing *v0*, *v1*, and *v2* vertices.
+    ///
+    /// - Note: Resulting plane is degenerate when *c0*, *c1* and *c2* are on the same plane.
+    @inlinable
+    public init<V0, V1, V2>(_ v0: V0, _ v1: V1, _ v2: V2)
+    where V0 : KvVertex3Protocol, V0.Math == Math, V1 : KvVertex3Protocol, V1.Math == Math, V2 : KvVertex3Protocol, V2.Math == Math {
+        self.init(normal: Math.cross(v1.coordinate - v0.coordinate, v2.coordinate - v0.coordinate), at: v0)
+    }
+
+
     /// A plane having given normal and containing given coordinate.
     @inlinable
     public init(normal: Vector, at coordinate: Coordinate) {
         self.init(normal: normal, d: -Math.dot(coordinate, normal))
+    }
+
+
+    /// A plane having given normal and containing given vertex.
+    @inlinable
+    public init<V>(normal: Vector, at vertex: V)
+    where V : KvVertex3Protocol, V.Math == Math {
+        self.init(normal: normal, d: -Math.dot(vertex.coordinate, normal))
     }
 
 

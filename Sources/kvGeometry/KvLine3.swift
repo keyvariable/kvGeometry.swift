@@ -63,12 +63,30 @@ public struct KvLine3<Math : KvMathScope> {
     @inlinable public init(_ c0: Coordinate, _ c1: Coordinate) { self.init(in: c1 - c0, at: c0) }
 
 
+    /// A line containing both *v0* and *v1* vertices.
+    ///
+    /// - Note: Resulting line is degenerate when coordinates of *v0* and *v1* are equal.
+    @inlinable
+    public init<V0, V1>(_ v0: V0, _ v1: V1)
+    where V0 : KvVertex3Protocol, V0.Math == Math, V1 : KvVertex3Protocol, V1.Math == Math {
+        self.init(in: v1.coordinate - v0.coordinate, at: v0.coordinate)
+    }
+
+
     /// A line matching given ray.
     @inlinable
     public init<V>(_ ray: KvRay3<V>)
     where V : KvVertex3Protocol, V.Math == Math
     {
         self.init(in: ray.direction, at: ray.origin.coordinate)
+    }
+
+
+    /// Initializes a line containing given segment.
+    @inlinable
+    public init<V>(_ segment: KvSegment3<V>)
+    where V : KvVertex3Protocol, V.Math == Math {
+        self.init(in: segment.front, at: segment.endPoints.0.coordinate)
     }
 
 
@@ -92,6 +110,14 @@ public struct KvLine3<Math : KvMathScope> {
         case false:
             self.init(quaternion: Quaternion(from: Self.front, to: direction), d: 0)
         }
+    }
+
+
+    /// A line having given direction and containing given coordinate.
+    @inlinable
+    public init<V>(in direction: Vector, at vertex: V)
+    where V : KvVertex3Protocol, V.Math == Math {
+        self.init(in: direction, at: vertex.coordinate)
     }
 
 
@@ -141,6 +167,39 @@ public struct KvLine3<Math : KvMathScope> {
         let c = c - closestToOrigin
         return Math.isZero(Math.cross(front, c),
                            eps: Math.epsArg(front).cross(Math.epsArg(c)).tolerance)
+    }
+
+
+    /// - Returns: Receivers coordinate having minimum distance to to given line or *nil* if the receiver and given line are parallel.
+    ///
+    /// - See  ``projection(of:)``.
+    @inlinable
+    public func nearby(to rhs: Self) -> Coordinate? {
+        let (lFront, lOrigin) = (front, closestToOrigin)
+        let (rFront, rOrigin) = (rhs.front, rhs.closestToOrigin)
+
+        let n = Math.cross(lFront, rFront)
+        let n2 = Math.cross(rFront, n)
+
+        let denominator = Math.dot(lFront, n2)
+
+        guard KvIsNonzero(denominator) else { return nil }
+
+        let lt = Math.dot(rFront, Math.cross(n, rOrigin - lOrigin)) / denominator
+        // let rt = Math.dot(lFront, Math.cross(n, rOrigin - lOrigin)) / denominator
+
+        return lOrigin + lt * lFront
+    }
+
+
+    /// - Returns: Projection of given coordinate on the receiver.
+    @inlinable
+    public func projection(of c: Coordinate) -> Coordinate {
+        let origin = closestToOrigin
+        let front = front
+
+        // Assuming front is a unit vector.
+        return origin + Math.dot((c - origin), front) * front
     }
 
 
