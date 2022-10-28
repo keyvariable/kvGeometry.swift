@@ -236,21 +236,21 @@ public struct KvPlane3<Math : KvMathScope> {
         let (n1, d1) = (normal, d)
         let (n2, d2) = (plane.normal, plane.d)
 
-        let front = Math.cross(n1, n2)
-        guard Math.isNonzero(front, eps: Math.epsArg(n1).cross(Math.epsArg(n2)).tolerance) else { return nil }
-
-        let common: Coordinate = {
+        let common: Coordinate
+        do {
             let n11 = Math.length²(n1), n22 = Math.length²(n2)
             let n12 = Math.dot(n1, n2)
 
-            let invD = 1 / (n11 * n22 - n12 * n12)
-            let c1 = (d2 * n12 - d1 * n22) * invD
-            let c2 = (d1 * n12 - d2 * n11) * invD
+            let d = (n11 * n22 - n12 * n12)
+            guard KvIsNonzero(d) else { return nil}
 
-            return c1 * n1 + c2 * n2
-        }()
+            let c1 = d2 * n12 - d1 * n22
+            let c2 = d1 * n12 - d2 * n11
 
-        return KvLine3<Math>(in: front, at: common)
+            common = (c1 * n1 + c2 * n2) / d
+        }
+
+        return KvLine3<Math>(in: Math.cross(n1, n2), at: common)
     }
 
 
