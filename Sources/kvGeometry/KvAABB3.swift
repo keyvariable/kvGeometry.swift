@@ -54,8 +54,15 @@ public struct KvAABB3<Math : KvMathScope> {
 
 
     /// A bounding box equal to given coordinate.
+    @inlinable public init(over c: Coordinate) { self.init(min: c, max: c) }
+
+    /// A bounding box equal to given vertex.
     @inlinable
-    public init(over c: Coordinate) { self.init(min: c, max: c) }
+    public init<V>(over v: V)
+    where V : KvVertex3Protocol, V.Math == Math {
+        self.init(over: v.coordinate)
+    }
+
 
     /// Minimum AABB containing given coordinates.
     @inlinable
@@ -64,12 +71,38 @@ public struct KvAABB3<Math : KvMathScope> {
                   max: Math.max(c0, c1))
     }
 
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<V0, V1>(over v0: V0, _ v1: V1)
+    where V0 : KvVertex3Protocol, V0.Math == Math, V1 : KvVertex3Protocol, V1.Math == Math {
+        self.init(over: v0.coordinate, v1.coordinate)
+    }
+
+
     /// Minimum AABB containing given coordinates.
     @inlinable
     public init(over c0: Coordinate, _ c1: Coordinate, _ c2: Coordinate) {
         self.init(min: Math.min(Math.min(c0, c1), c2),
                   max: Math.max(Math.max(c0, c1), c2))
     }
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<V0, V1, V2>(over v0: V0, _ v1: V1, _ v2: V2)
+    where V0 : KvVertex3Protocol, V0.Math == Math, V1 : KvVertex3Protocol, V1.Math == Math, V2 : KvVertex3Protocol, V2.Math == Math {
+        self.init(over: v0.coordinate, v1.coordinate, v2.coordinate)
+    }
+
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<V0, V1, V2, V3>(over v0: V0, _ v1: V1, _ v2: V2, _ v3: V3)
+    where V0 : KvVertex3Protocol, V0.Math == Math, V1 : KvVertex3Protocol, V1.Math == Math,
+    V2 : KvVertex3Protocol, V2.Math == Math, V3 : KvVertex3Protocol, V3.Math == Math
+    {
+        self.init(over: v0.coordinate, v1.coordinate, v2.coordinate, v3.coordinate)
+    }
+
 
     /// Minimum AABB containing given coordinates.
     @inlinable
@@ -85,9 +118,34 @@ public struct KvAABB3<Math : KvMathScope> {
         self.init(min: min, max: max)
     }
 
+
     /// Minimum AABB containing given coordinates.
     @inlinable
-    public init?<Coordinates>(over coordinates: Coordinates) where Coordinates : Sequence, Coordinates.Element == Coordinate {
+    public init<Coordinates>(over first: Coordinates.Element, _ rest: Coordinates)
+    where Coordinates : Sequence, Coordinates.Element == Coordinate {
+        var iterator = rest.makeIterator()
+        var min = first, max = first
+
+        while let c = iterator.next() {
+            min = Math.min(min, c)
+            max = Math.max(max, c)
+        }
+
+        self.init(min: min, max: max)
+    }
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<Vertices>(over first: Vertices.Element, _ rest: Vertices)
+    where Vertices : Sequence, Vertices.Element : KvVertex3Protocol, Vertices.Element.Math == Math {
+        self.init(over: first.coordinate, rest.lazy.map { $0.coordinate })
+    }
+
+
+    /// Minimum AABB containing given coordinates.
+    @inlinable
+    public init?<Coordinates>(over coordinates: Coordinates)
+    where Coordinates : Sequence, Coordinates.Element == Coordinate {
         var iterator = coordinates.makeIterator()
 
         guard let first = iterator.next() else { return nil }
@@ -100,6 +158,13 @@ public struct KvAABB3<Math : KvMathScope> {
         }
 
         self.init(min: min, max: max)
+    }
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init?<Vertices>(over vertices: Vertices)
+    where Vertices : Sequence, Vertices.Element : KvVertex3Protocol, Vertices.Element.Math == Math {
+        self.init(over: vertices.lazy.map { $0.coordinate })
     }
 
 

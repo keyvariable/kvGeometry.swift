@@ -54,8 +54,15 @@ public struct KvAABB2<Math : KvMathScope> {
 
 
     /// A bounding box equal to given coordinate.
+    @inlinable public init(over c: Coordinate) { self.init(min: c, max: c) }
+
+    /// A bounding box equal to given vertex.
     @inlinable
-    public init(over c: Coordinate) { self.init(min: c, max: c) }
+    public init<V>(over v: V)
+    where V : KvVertex2Protocol, V.Math == Math {
+        self.init(over: v.coordinate)
+    }
+
 
     /// Minimum AABB containing given coordinates.
     @inlinable
@@ -64,12 +71,38 @@ public struct KvAABB2<Math : KvMathScope> {
                   max: Math.max(c0, c1))
     }
 
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<V0, V1>(over v0: V0, _ v1: V1)
+    where V0 : KvVertex2Protocol, V0.Math == Math, V1 : KvVertex2Protocol, V1.Math == Math {
+        self.init(over: v0.coordinate, v1.coordinate)
+    }
+
+
     /// Minimum AABB containing given coordinates.
     @inlinable
     public init(over c0: Coordinate, _ c1: Coordinate, _ c2: Coordinate) {
         self.init(min: Math.min(Math.min(c0, c1), c2),
                   max: Math.max(Math.max(c0, c1), c2))
     }
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<V0, V1, V2>(over v0: V0, _ v1: V1, _ v2: V2)
+    where V0 : KvVertex2Protocol, V0.Math == Math, V1 : KvVertex2Protocol, V1.Math == Math, V2 : KvVertex2Protocol, V2.Math == Math {
+        self.init(over: v0.coordinate, v1.coordinate, v2.coordinate)
+    }
+
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<V0, V1, V2, V3>(over v0: V0, _ v1: V1, _ v2: V2, _ v3: V3)
+    where V0 : KvVertex2Protocol, V0.Math == Math, V1 : KvVertex2Protocol, V1.Math == Math,
+    V2 : KvVertex2Protocol, V2.Math == Math, V3 : KvVertex2Protocol, V3.Math == Math
+    {
+        self.init(over: v0.coordinate, v1.coordinate, v2.coordinate, v3.coordinate)
+    }
+
 
     /// Minimum AABB containing given coordinates.
     @inlinable
@@ -85,9 +118,34 @@ public struct KvAABB2<Math : KvMathScope> {
         self.init(min: min, max: max)
     }
 
+
     /// Minimum AABB containing given coordinates.
     @inlinable
-    public init?<Coordinates>(over coordinates: Coordinates) where Coordinates : Sequence, Coordinates.Element == Coordinate {
+    public init<Coordinates>(over first: Coordinates.Element, _ rest: Coordinates)
+    where Coordinates : Sequence, Coordinates.Element == Coordinate {
+        var iterator = rest.makeIterator()
+        var min = first, max = first
+
+        while let c = iterator.next() {
+            min = Math.min(min, c)
+            max = Math.max(max, c)
+        }
+
+        self.init(min: min, max: max)
+    }
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init<Vertices>(over first: Vertices.Element, _ rest: Vertices)
+    where Vertices : Sequence, Vertices.Element : KvVertex2Protocol, Vertices.Element.Math == Math {
+        self.init(over: first.coordinate, rest.lazy.map { $0.coordinate })
+    }
+
+
+    /// Minimum AABB containing given coordinates.
+    @inlinable
+    public init?<Coordinates>(over coordinates: Coordinates)
+    where Coordinates : Sequence, Coordinates.Element == Coordinate {
         var iterator = coordinates.makeIterator()
 
         guard let first = iterator.next() else { return nil }
@@ -100,6 +158,13 @@ public struct KvAABB2<Math : KvMathScope> {
         }
 
         self.init(min: min, max: max)
+    }
+
+    /// Minimum AABB containing given vertices.
+    @inlinable
+    public init?<Vertices>(over vertices: Vertices)
+    where Vertices : Sequence, Vertices.Element : KvVertex2Protocol, Vertices.Element.Math == Math {
+        self.init(over: vertices.lazy.map { $0.coordinate })
     }
 
 
@@ -151,6 +216,15 @@ public struct KvAABB2<Math : KvMathScope> {
     /// See ``union(_:)-78icx``, ``formUnion(_:)-80q0v``.
     @inlinable public func union(_ c: Coordinate) -> Self { Self(min: Math.min(min, c), max: Math.max(max, c)) }
 
+    /// - Returns: A minimum box containing the receiver and given vertex.
+    ///
+    /// See ``union(_:)-78icx``, ``formUnion(_:)-80q0v``.
+    @inlinable
+    public func union<V>(_ v: V) -> Self
+    where V : KvVertex2Protocol, V.Math == Math {
+        union(v.coordinate)
+    }
+
     /// - Returns: A minimum box containing the receiver and given coordinate.
     ///
     /// See ``union(_:)-2qrpu``, ``formUnion(_:)-5g79m``.
@@ -164,6 +238,16 @@ public struct KvAABB2<Math : KvMathScope> {
     public mutating func formUnion(_ c: Coordinate) {
         min = Math.min(min, c)
         max = Math.max(max, c)
+    }
+
+    /// - Returns: A minimum box containing the receiver and given vertex.
+    ///
+    /// See ``formUnion(_:)-5g79m``, ``union(_:)-2qrpu``.
+    @inlinable
+    public mutating func formUnion<V>(_ v: V)
+    where V : KvVertex2Protocol, V.Math == Math {
+        min = Math.min(min, v.coordinate)
+        max = Math.max(max, v.coordinate)
     }
 
     /// - Returns: A minimum box containing the receiver and given box.
