@@ -170,13 +170,11 @@ public struct KvLine2<Math : KvMathScope> {
 
 
     /// Alias to ``at``(method).
-    @inlinable
-    public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
+    @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 
-    /// - Returns: The distance from the receiver to *c* divided by length of the normal.
-    @inlinable
-    public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
+    /// - Returns: The distance from the receiver to  to given coordinate divided by length of the normal.
+    @inlinable public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
 
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
@@ -185,7 +183,8 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable public func contains(_ x: Coordinate) -> Bool { KvIsZero(at(x), eps: epsArg(at: x).tolerance) }
 
     /// - Returns: A boolean value indicating whether the receiver contains coordinates of given ray.
-    @inlinable public func contains<V>(_ ray: KvRay2<V>) -> Bool
+    @inlinable
+    public func contains<V>(_ ray: KvRay2<V>) -> Bool
     where V : KvVertex2Protocol, V.Math == Math
     {
         contains(ray.origin.coordinate)

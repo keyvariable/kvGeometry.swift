@@ -162,8 +162,16 @@ public struct KvLine3<Math : KvMathScope> {
     @inlinable public var isDegenerate: Bool { Math.isZero(quaternion) }
 
 
+    /// - Returns: The distance from the receiver to given coordinate.
+    @inlinable
+    public func offset(to x: Coordinate) -> Scalar {
+        Math.length(Math.cross(x - closestToOrigin, front))
+    }
+
+
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
-    @inlinable public func contains(_ c: Coordinate) -> Bool {
+    @inlinable
+    public func contains(_ c: Coordinate) -> Bool {
         let c = c - closestToOrigin
         return Math.isZero(Math.cross(front, c),
                            eps: Math.epsArg(front).cross(Math.epsArg(c)).tolerance)
