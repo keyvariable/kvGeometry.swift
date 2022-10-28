@@ -134,7 +134,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
     {
         let denominator = front.y * ray.front.x - front.x * ray.front.y
 
-        guard KvIsNonzero(denominator) else { return nil }
+        guard KvIsNonzero(denominator, eps: Math.epsArg(front).cross(Math.epsArg(ray.front)).tolerance) else { return nil }
 
         let recip_d = 1 / denominator
         let dOrigin = ray.origin.coordinate - origin.coordinate
@@ -154,7 +154,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
     public func offset(to line: KvLine2<Math>) -> Scalar? {
         let divider = Math.dot(line.normal, front)
 
-        guard KvIsNonzero(divider) else { return nil }
+        guard KvIsNonzero(divider, eps: Math.epsArg(line.normal).dot(Math.epsArg(front)).tolerance) else { return nil }
 
         let t = -line.at(origin.coordinate) / divider
 

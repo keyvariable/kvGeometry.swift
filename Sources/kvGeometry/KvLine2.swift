@@ -185,8 +185,7 @@ public struct KvLine2<Math : KvMathScope> {
     /// - Returns: A boolean value indicating whether the receiver contains coordinates of given ray.
     @inlinable
     public func contains<V>(_ ray: KvRay2<V>) -> Bool
-    where V : KvVertex2Protocol, V.Math == Math
-    {
+    where V : KvVertex2Protocol, V.Math == Math {
         contains(ray.origin.coordinate)
         && KvIsZero(Math.dot(normal, ray.front), eps: Math.epsArg(normal).dot(Math.epsArg(ray.front)).tolerance)
     }
@@ -232,7 +231,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func intersection(with line: Self) -> Coordinate? {
         let denominator = normal.x * line.normal.y - normal.y * line.normal.x
 
-        guard KvIsNonzero(denominator) else { return nil }
+        guard KvIsNonzero(denominator, eps: Math.epsArg(normal).cross(Math.epsArg(line.normal)).tolerance) else { return nil }
 
         return Coordinate(x: line.c * normal.y - c * line.normal.y, y: c * line.normal.x - line.c * normal.x) / denominator
     }

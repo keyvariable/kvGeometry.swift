@@ -132,7 +132,7 @@ public struct KvRay3<Vertex : KvVertex3Protocol> {
     public func offset(to plane: KvPlane3<Math>) -> Scalar? {
         let divider = Math.dot(plane.normal, front)
 
-        guard KvIsNonzero(divider) else { return nil }
+        guard KvIsNonzero(divider, eps: Math.epsArg(plane.normal).dot(Math.epsArg(front)).tolerance) else { return nil }
 
         let t = -plane.at(origin.coordinate) / divider
 

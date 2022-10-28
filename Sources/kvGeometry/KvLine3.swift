@@ -156,7 +156,7 @@ public struct KvLine3<Math : KvMathScope> {
 
         let denominator = Math.dot(lFront, n2)
 
-        guard KvIsNonzero(denominator) else { return nil }
+        guard KvIsNonzero(denominator, eps: Math.epsArg(lFront).dot(Math.epsArg(n2)).tolerance) else { return nil }
 
         let lt = Math.dot(rFront, Math.cross(n, rOrigin - lOrigin)) / denominator
         // let rt = Math.dot(lFront, Math.cross(n, rOrigin - lOrigin)) / denominator

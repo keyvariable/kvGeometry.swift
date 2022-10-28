@@ -237,7 +237,7 @@ public struct KvPlane3<Math : KvMathScope> {
         let (n2, d2) = (plane.normal, plane.d)
 
         let front = Math.cross(n1, n2)
-        guard Math.isNonzero(front) else { return nil }
+        guard Math.isNonzero(front, eps: Math.epsArg(n1).cross(Math.epsArg(n2)).tolerance) else { return nil }
 
         let common: Coordinate = {
             let n11 = Math.length²(n1), n22 = Math.length²(n2)
