@@ -99,7 +99,9 @@ public struct KvLine3<Math : KvMathScope> {
     @inlinable
     public init<V>(_ segment: KvSegment3<V>)
     where V : KvVertex3Protocol, V.Math == Math {
-        self.init(in: segment.front, at: segment.endPoints.0.coordinate)
+        let coordinate = segment.endPoints.0.coordinate
+
+        self.init(front: segment.front, origin: coordinate - Math.dot(coordinate, segment.front))
     }
 
 
