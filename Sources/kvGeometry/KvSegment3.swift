@@ -100,7 +100,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     @inlinable public func at(_ step: Scalar) -> Vertex { endPoints.0.mixed(endPoints.1, t: step * length⁻¹) }
 
 
-    /// - Returns: Coorinate of a vertex returned by `at(step)`.
+    /// - Returns: The same coordinate as `at(step).coordinate`.
     ///
     /// See ``at(_:)``.
     @inlinable public func coordinate(at step: Scalar) -> Vertex.Coordinate { endPoints.0.coordinate + step * front }

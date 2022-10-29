@@ -76,7 +76,15 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
 
     /// - Returns: *origin* + *front* · *step*.
+    ///
+    /// See ``coordinate(at:)``.
     @inlinable public func at(_ step: Scalar) -> Vertex { origin + front * step }
+
+
+    /// - Returns: The same coordinate as `at(step).coordinate`.
+    ///
+    /// See ``at(_:)``.
+    @inlinable public func coordinate(at step: Scalar) -> Vertex.Coordinate { origin.coordinate + front * step }
 
 
     /// Inverses the direction preserving the origin.
