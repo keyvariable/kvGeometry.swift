@@ -27,7 +27,7 @@ import kvKit
 
 /// Implementation of a segment in 3D coordinate space.
 ///
-/// The segment coordinates are represented with *endPoints.0* + *direction* · *offset* equation where *offset* ∈ [0, *length*]. See ``at(_:)`` method.
+/// The segment coordinates are represented with *endPoints.0* + *direction* · *step* equation where *step* ∈ [0, *length*]. See ``at(_:)`` method.
 public struct KvSegment3<Vertex : KvVertex3Protocol> {
 
     public typealias Math = Vertex.Math
@@ -97,7 +97,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     /// - Returns: Linear combination of the receiver's endPoints where `at(0) == endPoints.0` and `at(length) == endPoints.1`.
     ///
     /// See ``coordinate(at:)``.
-    @inlinable public func at(_ offset: Scalar) -> Vertex { endPoints.0.mixed(endPoints.1, t: offset * length⁻¹) }
+    @inlinable public func at(_ step: Scalar) -> Vertex { endPoints.0.mixed(endPoints.1, t: step * length⁻¹) }
 
 
     /// - Returns: Coorinate of a vertex returned by `at(step)`.
@@ -116,6 +116,8 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
 
     /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given plane.
     ///
+    /// - Note: It's equal to distance from *endPoints.0* to the intersection coordinate.
+    ///
     /// See ``at(_:)``, ``intersection(with:)``, ``intersects(with:)``.
     @inlinable
     public func step(to plane: KvPlane3<Math>) -> Scalar? {
@@ -125,7 +127,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
 
         let t = -plane.at(endPoints.0.coordinate) / divider
 
-        guard contains(offset: t) else { return nil }
+        guard contains(step: t) else { return nil }
 
         return t
     }
@@ -138,14 +140,14 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
         let cross = Math.cross(front, arg.vector)
 
         let isOnLine = Math.isZero(cross, eps: Math.epsArg(front).cross(arg.epsArg).tolerance)
-        /// Offset to the projection of the coordinate.
-        let offset = Math.dot(front, arg.vector)
+        /// Step to the projection of the coordinate.
+        let step = Math.dot(front, arg.vector)
 
-        guard KvIsNotNegative(offset)
-        else { return isOnLine ? -offset : Math.length(arg.vector) }
+        guard KvIsNotNegative(step)
+        else { return isOnLine ? -step : Math.length(arg.vector) }
 
-        guard KvIs(offset, lessThanOrEqualTo: length)
-        else { return isOnLine ? offset - length : Math.length(c - endPoints.1.coordinate) }
+        guard KvIs(step, lessThanOrEqualTo: length)
+        else { return isOnLine ? step - length : Math.length(c - endPoints.1.coordinate) }
 
         return isOnLine ? 0 : Math.length(cross)
     }
@@ -199,8 +201,10 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     }
 
 
-    /// - Returns: A boolean value indicating whether the receiver contains `at(offset)` coordinate.
-    @inlinable public func contains(offset: Scalar) -> Bool { KvIsNotNegative(offset) && KvIs(offset, lessThanOrEqualTo: length) }
+    /// - Returns: A boolean value indicating whether the receiver contains `at(step)` coordinate.
+    ///
+    /// See ``at(_:).
+    @inlinable public func contains(step: Scalar) -> Bool { KvIsNotNegative(step) && KvIs(step, lessThanOrEqualTo: length) }
 
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
@@ -210,7 +214,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
 
         guard Math.isZero(Math.cross(front, arg.vector), eps: Math.epsArg(front).cross(arg.epsArg).tolerance) else { return false }
 
-        return contains(offset: Math.dot(front, arg.vector))
+        return contains(step: Math.dot(front, arg.vector))
     }
 
     /// - Returns: A boolean value indicating whether the receiver contains given vertex.

@@ -100,7 +100,7 @@ public struct KvOriginRay3<Math : KvMathScope> {
 
     /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given plane.
     ///
-    /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    /// - Note: It's equal to distance from coordinate origin to the intersection coordinate when the receiver has unit direction.
     ///
     /// See ``at(_:)``.
     @inlinable

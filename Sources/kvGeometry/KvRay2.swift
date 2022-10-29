@@ -127,7 +127,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
     /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given ray.
     ///
-    /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    /// - Note: It's equal to distance from the receiver's *origin* to the intersection coordinate when the receiver has unit direction.
     ///
     /// See ``at(_:)``.
     @inlinable
@@ -150,7 +150,7 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
 
     /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given line.
     ///
-    /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    /// - Note: It's equal to distance from the receiver's *origin* to the intersection coordinate when the receiver has unit direction.
     ///
     /// See ``at(_:)``.
     @inlinable

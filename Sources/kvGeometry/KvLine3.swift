@@ -118,15 +118,15 @@ public struct KvLine3<Math : KvMathScope> {
 
     /// - Returns: The distance from the receiver to given coordinate.
     @inlinable
-    public func offset(to x: Coordinate) -> Scalar {
+    public func distance(to x: Coordinate) -> Scalar {
         Math.length(Math.cross(x - origin, front))
     }
 
     /// - Returns: The distance from the receiver to given vertex.
     @inlinable
-    public func offset<V>(to v: V) -> Scalar
+    public func distance<V>(to v: V) -> Scalar
     where V : KvVertex3Protocol, V.Math == Math {
-        offset(to: v.coordinate)
+        distance(to: v.coordinate)
     }
 
 

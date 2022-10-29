@@ -100,7 +100,7 @@ public struct KvOriginRay2<Math : KvMathScope> {
 
     /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given ray.
     ///
-    /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    /// - Note: It's equal to distance from coordinate origin to the intersection coordinate when the receiver has unit direction.
     ///
     /// See ``at(_:)``.
     @inlinable
@@ -123,7 +123,7 @@ public struct KvOriginRay2<Math : KvMathScope> {
 
     /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given line.
     ///
-    /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    /// - Note: It's equal to distance from coordinate origin to the intersection coordinate when the receiver has unit direction.
     ///
     /// See ``at(_:)``.
     @inlinable
