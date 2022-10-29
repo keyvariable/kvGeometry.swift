@@ -60,7 +60,7 @@ class KvRay2Tests : XCTestCase {
             let ray = Ray<Math>(in: .one, at: .init(.unitY))
 
             func Assert(_ other: Ray<Math>, _ expected: Math.Scalar?) {
-                KvAssertEqual(ray.offset(to: other), expected, by: KvIs(_:equalTo:))
+                KvAssertEqual(ray.step(to: other), expected, by: KvIs(_:equalTo:))
             }
 
             Assert(ray, nil)

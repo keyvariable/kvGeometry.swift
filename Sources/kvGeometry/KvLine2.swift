@@ -169,7 +169,7 @@ public struct KvLine2<Math : KvMathScope> {
     }
 
 
-    /// Alias to ``at``(method).
+    /// Alias to ``at(_:)`` method.
     @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 

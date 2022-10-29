@@ -165,7 +165,7 @@ public struct KvPlane3<Math : KvMathScope> {
     @inlinable public func epsArg(at x: Coordinate) -> Math.EpsArg { Math.epsArg(normal).dot(Math.epsArg(x)) + Math.EpsArg(d) }
 
 
-    /// Alias to ``at``(method).
+    /// Alias to ``at(_:)`` method.
     @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 

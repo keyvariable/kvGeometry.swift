@@ -60,8 +60,8 @@ public struct KvOriginRay2<Math : KvMathScope> {
     @inlinable public var isDegenerate: Bool { Math.isZero(front) }
 
 
-    /// - Returns: *front* · *t*.
-    @inlinable public func at(_ t: Scalar) -> Coordinate { front * t }
+    /// - Returns: *front* · *step*.
+    @inlinable public func at(_ step: Scalar) -> Coordinate { front * step }
 
 
     /// Inverses the direction.
@@ -98,13 +98,14 @@ public struct KvOriginRay2<Math : KvMathScope> {
     }
 
 
-    /// - Returns: *T* where *origin* + *front* · *t* is a coordinate the receiver intersects given ray.
+    /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given ray.
     ///
     /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    ///
+    /// See ``at(_:)``.
     @inlinable
-    public func offset<V>(to ray: KvRay2<V>) -> Scalar?
-    where V : KvVertex2Protocol, V.Math == Math
-    {
+    public func step<V>(to ray: KvRay2<V>) -> Scalar?
+    where V : KvVertex2Protocol, V.Math == Math {
         let denominator = front.y * ray.front.x - front.x * ray.front.y
 
         guard KvIsNonzero(denominator) else { return nil }
@@ -120,11 +121,13 @@ public struct KvOriginRay2<Math : KvMathScope> {
         return t
     }
 
-    /// - Returns: The argument of the receivers equation where the receiverintersect given plane.
+    /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given line.
     ///
     /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    ///
+    /// See ``at(_:)``.
     @inlinable
-    public func offset(to line: KvLine2<Math>) -> Scalar? {
+    public func step(to line: KvLine2<Math>) -> Scalar? {
         let divider = Math.dot(line.normal, front)
 
         guard KvIsNonzero(divider) else { return nil }
@@ -139,27 +142,25 @@ public struct KvOriginRay2<Math : KvMathScope> {
 
     /// - Returns: A boolean value indicating whether the receiver intersects given ray.
     @inlinable public func intersects<V>(with ray: KvRay2<V>) -> Bool
-    where V : KvVertex2Protocol, V.Math == Math
-    {
-        offset(to: ray) != nil
+    where V : KvVertex2Protocol, V.Math == Math {
+        step(to: ray) != nil
     }
 
     /// - Returns: A boolean value indicating whether the receiver intersects given plane.
-    @inlinable public func intersects(with line: KvLine2<Math>) -> Bool { offset(to: line) != nil }
+    @inlinable public func intersects(with line: KvLine2<Math>) -> Bool { step(to: line) != nil }
 
 
     /// - Returns: A copy of the origin translated to coordinate where the receiver and given ray intersect.
     @inlinable
     public func intersection<V>(with ray: KvRay2<V>) -> Coordinate?
-    where V : KvVertex2Protocol, V.Math == Math
-    {
-        offset(to: ray).map(self.at(_:))
+    where V : KvVertex2Protocol, V.Math == Math {
+        step(to: ray).map(self.at(_:))
     }
 
     /// - Returns: A copy of the origin translated to coordinate where the receiver and given plane intersect.
     @inlinable
     public func intersection(with line: KvLine2<Math>) -> Coordinate? {
-        offset(to: line).map(self.at(_:))
+        step(to: line).map(self.at(_:))
     }
 
 

@@ -60,8 +60,8 @@ public struct KvOriginRay3<Math : KvMathScope> {
     @inlinable public var isDegenerate: Bool { Math.isZero(front) }
 
 
-    /// - Returns: *front* · *t*.
-    @inlinable public func at(_ t: Scalar) -> Coordinate { front * t }
+    /// - Returns: *front* · *step*.
+    @inlinable public func at(_ step: Scalar) -> Coordinate { front * step }
 
 
     /// Inverses the direction.
@@ -98,11 +98,13 @@ public struct KvOriginRay3<Math : KvMathScope> {
     }
 
 
-    /// - Returns: The argument of the receivers equation where the receiverintersect given plane.
+    /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given plane.
     ///
     /// - Note: It's equal to distance to the intersection coordinate when the receiver has unit direction.
+    ///
+    /// See ``at(_:)``.
     @inlinable
-    public func offset(to plane: KvPlane3<Math>) -> Scalar? {
+    public func step(to plane: KvPlane3<Math>) -> Scalar? {
         let divider = Math.dot(plane.normal, front)
 
         guard KvIsNonzero(divider) else { return nil }
@@ -116,13 +118,13 @@ public struct KvOriginRay3<Math : KvMathScope> {
 
 
     /// - Returns: A boolean value indicating whether the receiver intersects given plane.
-    @inlinable public func intersects(with plane: KvPlane3<Math>) -> Bool { offset(to: plane) != nil }
+    @inlinable public func intersects(with plane: KvPlane3<Math>) -> Bool { step(to: plane) != nil }
 
 
     /// - Returns: A copy of the origin translated to coordinate where the receiver and given plane intersect.
     @inlinable
     public func intersection(with plane: KvPlane3<Math>) -> Coordinate? {
-        offset(to: plane).map(self.at(_:))
+        step(to: plane).map(self.at(_:))
     }
 
 

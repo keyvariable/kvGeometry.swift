@@ -58,7 +58,7 @@ class KvRay3Tests : XCTestCase {
             let ray = Ray<Math>(in: .one, at: [ 1, 0, 0 ])
 
             func Assert(_ ray: Ray<Math>, _ plane: KvPlane3<Math>, _ expected: Math.Scalar?) {
-                KvAssertEqual(ray.offset(to: plane), expected, by: KvIs(_:equalTo:))
+                KvAssertEqual(ray.step(to: plane), expected, by: KvIs(_:equalTo:))
             }
 
             Assert(ray, .init(normal: .unitX, d: 0), nil)

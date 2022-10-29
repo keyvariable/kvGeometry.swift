@@ -112,8 +112,8 @@ public struct KvLine3<Math : KvMathScope> {
     @inlinable public var anyCoordinate: Coordinate { origin }
 
 
-    /// - Returns: *origin* + *offset* · *front*.
-    @inlinable public func at(_ offset: Scalar) -> Coordinate { origin + offset * front }
+    /// - Returns: *origin* + *step* · *front*.
+    @inlinable public func at(_ step: Scalar) -> Coordinate { origin + step * front }
 
 
     /// - Returns: The distance from the receiver to given coordinate.

@@ -97,13 +97,13 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     /// - Returns: Linear combination of the receiver's endPoints where `at(0) == endPoints.0` and `at(length) == endPoints.1`.
     ///
     /// See ``coordinate(at:)``.
-    @inlinable public func at(_ t: Scalar) -> Vertex { endPoints.0.mixed(endPoints.1, t: t * length⁻¹) }
+    @inlinable public func at(_ offset: Scalar) -> Vertex { endPoints.0.mixed(endPoints.1, t: offset * length⁻¹) }
 
 
-    /// - Returns: Coorinate of a vertex at given offset *t*.
+    /// - Returns: Coorinate of a vertex returned by `at(step)`.
     ///
     /// See ``at(_:)``.
-    @inlinable public func coordinate(at t: Scalar) -> Vertex.Coordinate { endPoints.0.coordinate + t * front }
+    @inlinable public func coordinate(at step: Scalar) -> Vertex.Coordinate { endPoints.0.coordinate + step * front }
 
 
     /// - Returns: Copy of the receiver where vertices are cloned.
@@ -114,11 +114,11 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     @inlinable public func flipped() -> Self { Self(endPoints: (endPoints.0.flipped(), endPoints.1.flipped()), direction: front, length: length, length⁻¹: length⁻¹) }
 
 
-    /// - Returns: The argument of the receivers equation where the receiverintersect given plane.
+    /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given plane.
     ///
     /// See ``at(_:)``, ``intersection(with:)``, ``intersects(with:)``.
     @inlinable
-    public func offset(to plane: KvPlane3<Math>) -> Scalar? {
+    public func step(to plane: KvPlane3<Math>) -> Scalar? {
         let divider = Math.dot(plane.normal, front)
 
         guard KvIsNonzero(divider) else { return nil }
@@ -219,16 +219,16 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
 
     /// - Returns: A boolean value indicating whether the receiver intersects given plane.
     ///
-    /// See ``offset(to:)``, ``intersection(with:)``.
-    @inlinable public func intersects(with plane: KvPlane3<Math>) -> Bool { offset(to: plane) != nil }
+    /// See ``step(to:)``, ``intersection(with:)``.
+    @inlinable public func intersects(with plane: KvPlane3<Math>) -> Bool { step(to: plane) != nil }
 
 
     /// - Returns: A copy of the origin translated to coordinate where the receiver and given plane intersect.
     ///
-    /// See ``offset(to:)``, ``intersects(with:)``.
+    /// See ``step(to:)``, ``intersects(with:)``.
     @inlinable
     public func intersection(with plane: KvPlane3<Math>) -> Vertex? {
-        offset(to: plane).map(self.at(_:))
+        step(to: plane).map(self.at(_:))
     }
 
 
