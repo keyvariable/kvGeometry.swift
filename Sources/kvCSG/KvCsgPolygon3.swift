@@ -101,12 +101,12 @@ public struct KvCsgPolygon3<Vertex : KvVertex3Protocol, Payload> {
             .makeIterator()
 
         guard let first = iterator.next(),
-              var second = iterator.next()
+              var prev = iterator.next()
         else { return }
 
         while let next = iterator.next() {
-            body(first, second, next)
-            second = next
+            body(first, prev, next)
+            prev = next
         }
     }
 
