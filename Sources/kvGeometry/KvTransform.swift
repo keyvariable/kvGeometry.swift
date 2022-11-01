@@ -235,6 +235,13 @@ public struct KvTransform2<Math : KvMathScope> {
     }
 
 
+    /// Translation component of the receiver.
+    ///
+    /// - Warning: Assuming bottom row of the receiver's matrix is `[ 0, 0, 1 ]`.
+    @inlinable
+    public static func translation(from m: Matrix) -> Vector { Math.make2(m[2]) }
+
+
     /// - Returns: Transformed coordinate by a transformation represented as given matrix.
     @inlinable
     public static func act(_ matrix: Matrix, coordinate c: Vector) -> Vector {
@@ -351,7 +358,7 @@ public struct KvTransform2<Math : KvMathScope> {
     /// Translation component of the receiver.
     ///
     /// - Warning: Assuming bottom row of the receiver's matrix is `[ 0, 0, 1 ]`.
-    @inlinable public var translation: Vector { Math.make2(matrix[2]) }
+    @inlinable public var translation: Vector { KvTransform2.translation(from: matrix) }
 
 
     /// - Returns: Tranformed normal.
@@ -858,6 +865,13 @@ public struct KvTransform3<Math : KvMathScope> {
     }
 
 
+    /// Translation component of the receiver.
+    ///
+    /// - Warning: Assuming bottom row of the receiver's matrix is `[ 0, 0, 0, 1 ]`.
+    @inlinable
+    public static func translation(from m: Matrix) -> Vector { Math.make3(m[3]) }
+
+
     /// - Returns: Transformed coordinate by a transformation represented as given matrix.
     @inlinable
     public static func act(_ matrix: Matrix, coordinate c: Vector) -> Vector {
@@ -1018,7 +1032,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// Translation component of the receiver.
     ///
     /// - Warning: Assuming bottom row of the receiver's matrix is `[ 0, 0, 0, 1 ]`.
-    @inlinable public var translation: Vector { Math.make3(matrix[3]) }
+    @inlinable public var translation: Vector { KvTransform3.translation(from: matrix) }
 
 
     /// - Returns: Tranformed normal.
