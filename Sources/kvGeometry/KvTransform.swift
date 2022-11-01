@@ -388,6 +388,17 @@ public struct KvTransform2<Math : KvMathScope> {
     }
 
     @inlinable
+    public static func *(lhs: Self, rhs: KvAffineTransform2<Math>) -> Self {
+        Self(lhs.matrix * Math.make3(rhs.matrix), inverseMatrix: Math.make3(rhs.inverseMatrix) * lhs.inverseMatrix)
+    }
+
+    @inlinable
+    public static func *(lhs: KvAffineTransform2<Math>, rhs: Self) -> Self {
+        Self(Math.make3(lhs.matrix) * rhs.matrix, inverseMatrix: rhs.inverseMatrix * Math.make3(lhs.inverseMatrix))
+    }
+
+
+    @inlinable
     public static func *(lhs: Self, rhs: Vector) -> Vector { lhs.act(vector: rhs) }
 
 }
@@ -1042,6 +1053,17 @@ public struct KvTransform3<Math : KvMathScope> {
     public static func *(lhs: Self, rhs: Self) -> Self {
         Self(lhs.matrix * rhs.matrix, inverseMatrix: rhs.inverseMatrix * lhs.inverseMatrix)
     }
+
+    @inlinable
+    public static func *(lhs: Self, rhs: KvAffineTransform3<Math>) -> Self {
+        Self(lhs.matrix * Math.make4(rhs.matrix), inverseMatrix: Math.make4(rhs.inverseMatrix) * lhs.inverseMatrix)
+    }
+
+    @inlinable
+    public static func *(lhs: KvAffineTransform3<Math>, rhs: Self) -> Self {
+        Self(Math.make4(lhs.matrix) * rhs.matrix, inverseMatrix: rhs.inverseMatrix * Math.make4(lhs.inverseMatrix))
+    }
+
 
     @inlinable
     public static func *(lhs: Self, rhs: Vector) -> Vector { lhs.act(vector: rhs) }
