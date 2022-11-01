@@ -92,6 +92,12 @@ public struct KvCsgPolygon2<Vertex : KvVertex3Protocol, Payload> {
         _shape = Shape(unsafeVertices: _shape.vertices.map { Vertex2(t * $0.underlying) })
     }
 
+    /// Designated to scale polygons.
+    @usableFromInline
+    internal mutating func apply(_ t: KvAffineTransform3<Math>) {
+        _shape = Shape(unsafeVertices: _shape.vertices.map { Vertex2(t * $0.underlying) })
+    }
+
 
     /// - Returns: Flipped copy of the receiver.
     @inlinable public func flipped() -> Self { Self(shape: _shape.flipped(), payload: payload) }
@@ -119,6 +125,12 @@ public struct KvCsgPolygon2<Vertex : KvVertex3Protocol, Payload> {
     /// Designated to scale polygons.
     @usableFromInline
     internal static func *(lhs: KvTransform3<Math>, rhs: Self) -> Self {
+        Self(shape: Shape(unsafeVertices: rhs._shape.vertices.map { Vertex2(lhs * $0.underlying) }), payload: rhs.payload)
+    }
+
+    /// Designated to scale polygons.
+    @usableFromInline
+    internal static func *(lhs: KvAffineTransform3<Math>, rhs: Self) -> Self {
         Self(shape: Shape(unsafeVertices: rhs._shape.vertices.map { Vertex2(lhs * $0.underlying) }), payload: rhs.payload)
     }
 
