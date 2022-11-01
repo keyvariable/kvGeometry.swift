@@ -73,9 +73,37 @@ public struct KvTransform2<Math : KvMathScope> {
     }
 
 
+    /// See ``init(_:translation:)``, ``init(_:relativeTo:)``.
     @inlinable
     public init(_ t: KvAffineTransform2<Math>) {
         self.init(Math.make3(t.matrix), Math.make3(t.inverseMatrix), t.normalMatrix)
+    }
+
+
+    /// Initializes combination of given affine tranformation and translation.
+    ///
+    /// See ``init(_:)``, ``init(_:relativeTo:)``.
+    @inlinable
+    public init(_ t: KvAffineTransform2<Math>, translation: Vector) {
+        self.init(Matrix(Math.make3(t.matrix[0]),
+                         Math.make3(t.matrix[1]),
+                         Matrix.Column(translation, 1)),
+                  Matrix(Math.make3(t.inverseMatrix[0]),
+                         Math.make3(t.inverseMatrix[1]),
+                         Matrix.Column(t.inverseMatrix * -translation, 1)),
+                  t.normalMatrix)
+    }
+
+
+    /// Initializes transformation equal to application of given affine tranformation relative coordinate.
+    /// It equal to T(by: *translation*) × *t* × T(by: –*translation*).
+    ///
+    /// E.g. rotation relative to a coordinate may be initialized this way.
+    ///
+    /// See ``init(_:)``, ``init(_:translation:)``.
+    @inlinable
+    public init(_ t: KvAffineTransform2<Math>, relativeTo coordinate: Vector) {
+        self.init(t, translation: coordinate - t.matrix * coordinate)
     }
 
 
@@ -696,9 +724,39 @@ public struct KvTransform3<Math : KvMathScope> {
     }
 
 
+    /// See ``init(_:translation:)``, ``init(_:relativeTo:)``.
     @inlinable
     public init(_ t: KvAffineTransform3<Math>) {
         self.init(Math.make4(t.matrix), Math.make4(t.inverseMatrix), t.normalMatrix)
+    }
+
+
+    /// Initializes combination of given affine tranformation and translation.
+    ///
+    /// See ``init(_:)``, ``init(_:relativeTo:)``.
+    @inlinable
+    public init(_ t: KvAffineTransform3<Math>, translation: Vector) {
+        self.init(Matrix(Math.make4(t.matrix[0]),
+                         Math.make4(t.matrix[1]),
+                         Math.make4(t.matrix[2]),
+                         Matrix.Column(translation, 1)),
+                  Matrix(Math.make4(t.inverseMatrix[0]),
+                         Math.make4(t.inverseMatrix[1]),
+                         Math.make4(t.inverseMatrix[2]),
+                         Matrix.Column(t.inverseMatrix * -translation, 1)),
+                  t.normalMatrix)
+    }
+
+
+    /// Initializes transformation equal to application of given affine tranformation relative coordinate.
+    /// It equal to T(by: *translation*) × *t* × T(by: –*translation*).
+    ///
+    /// E.g. rotation relative to a coordinate may be initialized this way.
+    ///
+    /// See ``init(_:)``, ``init(_:translation:)``.
+    @inlinable
+    public init(_ t: KvAffineTransform3<Math>, relativeTo coordinate: Vector) {
+        self.init(t, translation: coordinate - t.matrix * coordinate)
     }
 
 
@@ -959,7 +1017,7 @@ public struct KvTransform3<Math : KvMathScope> {
 
     /// - Returns: Matrix of standard orthogonal projection.
     @inlinable
-    public static func orthogonalProjection(left: Scalar, right: Scalar, top: Scalar, bottom: Scalar, near: Scalar, far: Scalar) -> Matrix {
+    public static func orthogonalProjectionMatrix(left: Scalar, right: Scalar, top: Scalar, bottom: Scalar, near: Scalar, far: Scalar) -> Matrix {
         Matrix(diagonal: 1 / Matrix.Diagonal(left - right, bottom - top, near - far, 1))
         * Matrix([ -2,  0, 0, 0 ],
                  [  0, -2, 0, 0 ],
@@ -973,7 +1031,7 @@ public struct KvTransform3<Math : KvMathScope> {
     ///
     /// - Returns: Projection matrix for a centered rectangular pinhole camera.
     @inlinable
-    public static func perspectiveProjection(aspect: Scalar, fov: Scalar, near: Scalar, far: Scalar) -> Matrix {
+    public static func perspectiveProjectionMatrix(aspect: Scalar, fov: Scalar, near: Scalar, far: Scalar) -> Matrix {
         let tg = Math.tan(0.5 * fov)
 
         return (Matrix(diagonal: 1 / Matrix.Diagonal(aspect * tg, tg, near - far, 1))
