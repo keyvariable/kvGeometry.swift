@@ -85,17 +85,13 @@ public struct KvTransform2<Math : KvMathScope> {
     /// See ``init(_:)``, ``init(_:relativeTo:)``.
     @inlinable
     public init(_ t: KvAffineTransform2<Math>, translation: Vector) {
-        self.init(Matrix(Math.make3(t.matrix[0]),
-                         Math.make3(t.matrix[1]),
-                         Matrix.Column(translation, 1)),
-                  Matrix(Math.make3(t.inverseMatrix[0]),
-                         Math.make3(t.inverseMatrix[1]),
-                         Matrix.Column(t.inverseMatrix * -translation, 1)),
+        self.init(KvTransform2.makeMatrix(t.matrix, translation: translation),
+                  KvTransform2.makeMatrix(t.inverseMatrix, translation: t.inverseMatrix * -translation),
                   t.normalMatrix)
     }
 
 
-    /// Initializes transformation equal to application of given affine tranformation relative coordinate.
+    /// Initializes transformation equal to application of given affine tranformation relative to given coordinate.
     /// It equal to T(by: *translation*) × *t* × T(by: –*translation*).
     ///
     /// E.g. rotation relative to a coordinate may be initialized this way.
@@ -282,6 +278,28 @@ public struct KvTransform2<Math : KvMathScope> {
     @inlinable
     public static func act(_ matrix: Matrix, vector v: Vector) -> Vector {
         Math.make2(matrix * Math.make3(v))
+    }
+
+
+    /// - Returns: Combination of given affine tranformation matrix and translation.
+    ///
+    /// See ``makeMatrix(_:relativeTo:)``.
+    @inlinable
+    public static func makeMatrix(_ a: KvAffineTransform2<Math>.Matrix, translation: Vector) -> Matrix {
+        Matrix(Math.make3(a[0]),
+               Math.make3(a[1]),
+               Matrix.Column(translation, 1))
+    }
+
+
+    /// - Returns: Transformation matrix representing application of given affine tranformation relative to given coordinate. It equal to T(by: *translation*) × *a* × T(by: –*translation*).
+    ///
+    /// E.g. rotation relative to a coordinate may be initialized this way.
+    ///
+    /// See ``makeMatrix(_:translation:)``.
+    @inlinable
+    public static func makeMatrix(_ a: KvAffineTransform2<Math>.Matrix, relativeTo coordinate: Vector) -> Matrix {
+        makeMatrix(a, translation: coordinate - a * coordinate)
     }
 
 
@@ -736,19 +754,13 @@ public struct KvTransform3<Math : KvMathScope> {
     /// See ``init(_:)``, ``init(_:relativeTo:)``.
     @inlinable
     public init(_ t: KvAffineTransform3<Math>, translation: Vector) {
-        self.init(Matrix(Math.make4(t.matrix[0]),
-                         Math.make4(t.matrix[1]),
-                         Math.make4(t.matrix[2]),
-                         Matrix.Column(translation, 1)),
-                  Matrix(Math.make4(t.inverseMatrix[0]),
-                         Math.make4(t.inverseMatrix[1]),
-                         Math.make4(t.inverseMatrix[2]),
-                         Matrix.Column(t.inverseMatrix * -translation, 1)),
+        self.init(KvTransform3.makeMatrix(t.matrix, translation: translation),
+                  KvTransform3.makeMatrix(t.inverseMatrix, translation: t.inverseMatrix * -translation),
                   t.normalMatrix)
     }
 
 
-    /// Initializes transformation equal to application of given affine tranformation relative coordinate.
+    /// Initializes transformation equal to application of given affine tranformation relative to given coordinate.
     /// It equal to T(by: *translation*) × *t* × T(by: –*translation*).
     ///
     /// E.g. rotation relative to a coordinate may be initialized this way.
@@ -942,6 +954,29 @@ public struct KvTransform3<Math : KvMathScope> {
     @inlinable
     public static func act(_ matrix: Matrix, vector v: Vector) -> Vector {
         Math.make3(matrix * Math.make4(v))
+    }
+
+
+    /// - Returns: Combination of given affine tranformation matrix and translation.
+    ///
+    /// See ``makeMatrix(_:relativeTo:)``.
+    @inlinable
+    public static func makeMatrix(_ a: KvAffineTransform3<Math>.Matrix, translation: Vector) -> Matrix {
+        Matrix(Math.make4(a[0]),
+               Math.make4(a[1]),
+               Math.make4(a[2]),
+               Matrix.Column(translation, 1))
+    }
+
+
+    /// - Returns: Transformation matrix representing application of given affine tranformation relative to given coordinate. It equal to T(by: *translation*) × *a* × T(by: –*translation*).
+    ///
+    /// E.g. rotation relative to a coordinate may be initialized this way.
+    ///
+    /// See ``makeMatrix(_:translation:)``.
+    @inlinable
+    public static func makeMatrix(_ a: KvAffineTransform3<Math>.Matrix, relativeTo coordinate: Vector) -> Matrix {
+        makeMatrix(a, translation: coordinate - a * coordinate)
     }
 
 
