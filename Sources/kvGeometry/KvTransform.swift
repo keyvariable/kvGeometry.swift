@@ -266,6 +266,17 @@ public struct KvTransform2<Math : KvMathScope> {
     public static func translation(from m: Matrix) -> Vector { Math.make2(m[2]) }
 
 
+    /// Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisX``.
+    @inlinable public static func basisX(from m: Matrix) -> Vector { Math.make2(m[0]) }
+
+    /// Transformed Y basis vector.
+    ///
+    /// See: ``basisX(from:)``, ``basisY``.
+    @inlinable public static func basisY(from m: Matrix) -> Vector { Math.make2(m[1]) }
+
+
     /// - Returns: Transformed coordinate by a transformation represented as given matrix.
     @inlinable
     public static func act(_ matrix: Matrix, coordinate c: Vector) -> Vector {
@@ -379,9 +390,13 @@ public struct KvTransform2<Math : KvMathScope> {
     // MARK: Operations
 
     /// Transformed X basis vector.
-    @inlinable public var basisX: Vector { Math.make2(matrix[0]) }
+    ///
+    /// See: ``basisY``, ``basisX(from:)``.
+    @inlinable public var basisX: Vector { KvTransform2.basisX(from: matrix) }
     /// Transformed Y basis vector.
-    @inlinable public var basisY: Vector { Math.make2(matrix[1]) }
+    ///
+    /// See: ``basisX``, ``basisY(from:)``.
+    @inlinable public var basisY: Vector { KvTransform2.basisY(from: matrix) }
 
 
     /// A boolean value indicating whether the receiver is numerically equal to identity tranformation.
@@ -586,6 +601,17 @@ public struct KvAffineTransform2<Math : KvMathScope> {
     }
 
 
+    /// Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisX``.
+    @inlinable public static func basisX(from m: Matrix) -> Vector { m[0] }
+
+    /// Transformed Y basis vector.
+    ///
+    /// See: ``basisX(from:)``, ``basisY``.
+    @inlinable public static func basisY(from m: Matrix) -> Vector { m[1] }
+
+
     /// - Returns: Matrix produced from *m* by normalization of the scale component.
     ///
     /// - Note: This method is to be applied to normal matrices to compensate for the effect on length of normals.
@@ -631,9 +657,13 @@ public struct KvAffineTransform2<Math : KvMathScope> {
     // MARK: Operations
 
     /// Transformed X basis vector.
-    @inlinable public var basisX: Vector { matrix[0] }
+    ///
+    /// See: ``basisY``, ``basisX(from:)``.
+    @inlinable public var basisX: Vector { KvAffineTransform2.basisX(from: matrix) }
     /// Transformed Y basis vector.
-    @inlinable public var basisY: Vector { matrix[1] }
+    ///
+    /// See: ``basisX``, ``basisY(from:)``.
+    @inlinable public var basisY: Vector { KvAffineTransform2.basisY(from: matrix) }
 
 
     /// A boolean value indicating whether the receiver is numerically equal to identity tranformation.
@@ -942,6 +972,22 @@ public struct KvTransform3<Math : KvMathScope> {
     public static func translation(from m: Matrix) -> Vector { Math.make3(m[3]) }
 
 
+    /// Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisZ(from:)``, ``basisX``.
+    @inlinable public static func basisX(from m: Matrix) -> Vector { Math.make3(m[0]) }
+
+    /// Transformed Y basis vector.
+    ///
+    /// See: ``basisX(from:)``, ``basisZ(from:)``, ``basisY``.
+    @inlinable public static func basisY(from m: Matrix) -> Vector { Math.make3(m[1]) }
+
+    /// Transformed Z basis vector.
+    ///
+    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ``.
+    @inlinable public static func basisZ(from m: Matrix) -> Vector { Math.make3(m[2]) }
+
+
     /// - Returns: Transformed coordinate by a transformation represented as given matrix.
     @inlinable
     public static func act(_ matrix: Matrix, coordinate c: Vector) -> Vector {
@@ -1098,11 +1144,17 @@ public struct KvTransform3<Math : KvMathScope> {
     // MARK: Operations
 
     /// Transformed X basis vector.
-    @inlinable public var basisX: Vector { Math.make3(matrix[0]) }
+    ///
+    /// See: ``basisY``, ``basisZ``, ``basisX(from:)``.
+    @inlinable public var basisX: Vector { KvTransform3.basisX(from: matrix) }
     /// Transformed Y basis vector.
-    @inlinable public var basisY: Vector { Math.make3(matrix[1]) }
+    ///
+    /// See: ``basisX``, ``basisZ``, ``basisY(from:)``.
+    @inlinable public var basisY: Vector { KvTransform3.basisY(from: matrix) }
     /// Transformed Z basis vector.
-    @inlinable public var basisZ: Vector { Math.make3(matrix[2]) }
+    ///
+    /// See: ``basisX``, ``basisY``, ``basisZ(from:)``.
+    @inlinable public var basisZ: Vector { KvTransform3.basisZ(from: matrix) }
 
 
     /// A boolean value indicating whether the receiver is numerically equal to identity tranformation.
@@ -1309,6 +1361,22 @@ public struct KvAffineTransform3<Math : KvMathScope> {
     }
 
 
+    /// Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisZ(from:)``, ``basisX``.
+    @inlinable public static func basisX(from m: Matrix) -> Vector { m[0] }
+
+    /// Transformed Y basis vector.
+    ///
+    /// See: ``basisX(from:)``, ``basisZ(from:)``, ``basisY``.
+    @inlinable public static func basisY(from m: Matrix) -> Vector { m[1] }
+
+    /// Transformed Z basis vector.
+    ///
+    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ``.
+    @inlinable public static func basisZ(from m: Matrix) -> Vector { m[2] }
+
+
     /// - Returns: Scale factor applied to given normal matrix to compensate for the effect on length of normals.
     ///
     /// - Note: This method is to be applied to normal matrices to compensate for the effect on length of normals.
@@ -1357,11 +1425,17 @@ public struct KvAffineTransform3<Math : KvMathScope> {
     // MARK: Operations
 
     /// Transformed X basis vector.
-    @inlinable public var basisX: Vector { matrix[0] }
+    ///
+    /// See: ``basisY``, ``basisZ``, ``basisX(from:)``.
+    @inlinable public var basisX: Vector { KvAffineTransform3.basisX(from: matrix) }
     /// Transformed Y basis vector.
-    @inlinable public var basisY: Vector { matrix[1] }
+    ///
+    /// See: ``basisX``, ``basisZ``, ``basisY(from:)``.
+    @inlinable public var basisY: Vector { KvAffineTransform3.basisY(from: matrix) }
     /// Transformed Z basis vector.
-    @inlinable public var basisZ: Vector { matrix[2] }
+    ///
+    /// See: ``basisX``, ``basisY``, ``basisZ(from:)``.
+    @inlinable public var basisZ: Vector { KvAffineTransform3.basisZ(from: matrix) }
 
 
     /// A boolean value indicating whether the receiver is numerically equal to identity tranformation.
