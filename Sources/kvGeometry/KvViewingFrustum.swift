@@ -54,46 +54,35 @@ public struct KvViewingFrustum<Math : KvMathScope> {
 
 
     /// Initializes a frustum with a perspective projection matrix.
+    ///
+    /// See: ``normalized()``, ``safeNormalized()``, ``isDegenerate``.
     @inlinable
-    public init?(_ projectionMatrix: Matrix) {
+    public init(_ projectionMatrix: Matrix) {
         let m = projectionMatrix.transpose
 
         left = Plane(abcd: m[3] + m[0])
-        guard !left.isDegenerate else { return nil }
-
         right = Plane(abcd: m[3] - m[0])
-        guard !right.isDegenerate else { return nil }
 
         bottom = Plane(abcd: m[3] + m[1])
-        guard !bottom.isDegenerate else { return nil }
-
         top = Plane(abcd: m[3] - m[1])
-        guard !top.isDegenerate else { return nil }
 
         near = Plane(abcd: m[3] + m[2])
-        guard !near.isDegenerate else { return nil }
-
         far = Plane(abcd: m[3] - m[2])
-        guard !far.isDegenerate else { return nil }
     }
 
 
     /// Initializes a frustum with a perspective projection matrix overriding Z planes.
+    ///
+    /// See: ``normalized()``, ``safeNormalized()``, ``isDegenerate``.
     @inlinable
-    public init?(_ projectionMatrix: Matrix, zNear: Scalar, zFar: Scalar) {
+    public init(_ projectionMatrix: Matrix, zNear: Scalar, zFar: Scalar) {
         let m = projectionMatrix.transpose
 
         left = Plane(abcd: m[3] + m[0])
-        guard !left.isDegenerate else { return nil }
-
         right = Plane(abcd: m[3] - m[0])
-        guard !right.isDegenerate else { return nil }
 
         bottom = Plane(abcd: m[3] + m[1])
-        guard !bottom.isDegenerate else { return nil }
-
         top = Plane(abcd: m[3] - m[1])
-        guard !top.isDegenerate else { return nil }
 
         (near, far) = (zFar < zNear
                        ? (Plane(normal: .unitNZ, d:  zNear), Plane(normal: .unitZ, d: -zFar))
@@ -120,6 +109,20 @@ public struct KvViewingFrustum<Math : KvMathScope> {
 
 
     // MARK: Operations
+
+    /// - Returns: A boolean value indicating whether the receiver has a degenerate plane.
+    ///
+    /// - Note: Sometimes 3D engines use large Z ranges and the planes can be threated as degenerate. Use ``normalized()`` or ``safeNormalized()`` to handle such cases.
+    @inlinable
+    public var isDegenerate: Bool {
+        left.isDegenerate
+        || right.isDegenerate
+        || bottom.isDegenerate
+        || top.isDegenerate
+        || near.isDegenerate
+        || far.isDegenerate
+    }
+
 
     /// - Returns: Minimum of signed offsets to the receiver's planes.
     ///
@@ -155,12 +158,15 @@ public struct KvViewingFrustum<Math : KvMathScope> {
     /// - Returns: A copy of the receiver where all the planes are safely normalized.
     @inlinable
     public mutating func safeNormalized() -> Self? {
-        guard let l = left.safeNormalized(),
-              let r = right.safeNormalized(),
-              let b = bottom.safeNormalized(),
-              let t = top.safeNormalized(),
-              let n = near.safeNormalized(),
-              let f = far.safeNormalized()
+        /// Precise tolerance is required. Otherwise valid planes (e.g. far) can be threated as degenerate.
+        let eps = KvEpsArg(sqr(Scalar.ulpOfOne)).tolerance
+
+        guard let l = left.safeNormalized(eps: eps),
+              let r = right.safeNormalized(eps: eps),
+              let b = bottom.safeNormalized(eps: eps),
+              let t = top.safeNormalized(eps: eps),
+              let n = near.safeNormalized(eps: eps),
+              let f = far.safeNormalized(eps: eps)
         else { return nil }
 
         return Self(left: l, right: r, bottom: b, top: t, near: n, far: f)
