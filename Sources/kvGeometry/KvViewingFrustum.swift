@@ -230,11 +230,11 @@ import SceneKit
 extension KvViewingFrustum where Math == KvMathFloatScope {
 
     /// Initializes an instance from projection matrix given as an instance of *SCNMatrix4*.
-    @inlinable public init?(_ projectionMatrix: SCNMatrix4) { self.init(simd_float4x4(projectionMatrix)) }
+    @inlinable public init(_ projectionMatrix: SCNMatrix4) { self.init(simd_float4x4(projectionMatrix)) }
 
 
     /// Initializes an instance from projection matrix of given camera.
-    @inlinable public init?(_ camera: SCNCamera) { self.init(camera.projectionTransform) }
+    @inlinable public init(_ camera: SCNCamera) { self.init(camera.projectionTransform) }
 
 
     /// Initializes an instance from projection matrix of renderers current point of view.
@@ -251,11 +251,11 @@ extension KvViewingFrustum where Math == KvMathFloatScope {
 extension KvViewingFrustum where Math == KvMathDoubleScope {
 
     /// Initializes an instance from projection matrix given as an instance of *SCNMatrix4*.
-    @inlinable public init?(_ projectionMatrix: SCNMatrix4) { self.init(simd_double4x4(projectionMatrix)) }
+    @inlinable public init(_ projectionMatrix: SCNMatrix4) { self.init(simd_double4x4(projectionMatrix)) }
 
 
     /// Initializes an instance from projection matrix of given camera.
-    @inlinable public init?(_ camera: SCNCamera) { self.init(camera.projectionTransform) }
+    @inlinable public init(_ camera: SCNCamera) { self.init(camera.projectionTransform) }
 
 
     /// Initializes an instance from projection matrix of renderers current point of view.
