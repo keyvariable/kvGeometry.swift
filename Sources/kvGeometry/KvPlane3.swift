@@ -290,11 +290,27 @@ public struct KvPlane3<Math : KvMathScope> {
         normalize()
     }
 
+    /// - Returns: A plane matching the receiver but having unit normal.
+    @inlinable
+    public mutating func safeNormalize(eps: Math.Eps) {
+        guard Math.isNonzero(normal, eps: eps) else { return }
+
+        normalize()
+    }
+
 
     /// - Returns: A plane matching the receiver but having unit normal when the receiver's normal isn't a zero vector.
     @inlinable
     public func safeNormalized() -> Self? {
         guard Math.isNonzero(normal) else { return nil }
+
+        return normalized()
+    }
+
+    /// - Returns: A plane matching the receiver but having unit normal when the receiver's normal isn't a zero vector.
+    @inlinable
+    public func safeNormalized(eps: Math.Eps) -> Self? {
+        guard Math.isNonzero(normal, eps: eps) else { return nil }
 
         return normalized()
     }
