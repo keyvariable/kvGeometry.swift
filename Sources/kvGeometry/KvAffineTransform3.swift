@@ -132,19 +132,29 @@ public struct KvAffineTransform3<Math : KvMathScope> {
     }
 
 
-    /// Transformed X basis vector.
+    /// - Returns: Transformed basis vector for given index.
     ///
-    /// See: ``basisY(from:)``, ``basisZ(from:)``, ``basisX``.
+    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ(from:)``.
+    @inlinable
+    public static func basis(_ index: Int, from m: Matrix) -> Vector {
+        assert((0..<3).contains(index), "Unvalid basis vector index (\(index)) for KvAffineTransform3")
+        return m[index]
+    }
+
+
+    /// - Returns: Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisZ(from:)``, ``basisX``, ``basis(_:from:)``.
     @inlinable public static func basisX(from m: Matrix) -> Vector { m[0] }
 
-    /// Transformed Y basis vector.
+    /// - Returns: Transformed Y basis vector.
     ///
-    /// See: ``basisX(from:)``, ``basisZ(from:)``, ``basisY``.
+    /// See: ``basisX(from:)``, ``basisZ(from:)``, ``basisY``, ``basis(_:from:)``.
     @inlinable public static func basisY(from m: Matrix) -> Vector { m[1] }
 
-    /// Transformed Z basis vector.
+    /// - Returns: Transformed Z basis vector.
     ///
-    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ``.
+    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ``, ``basis(_:from:)``.
     @inlinable public static func basisZ(from m: Matrix) -> Vector { m[2] }
 
 
@@ -197,15 +207,15 @@ public struct KvAffineTransform3<Math : KvMathScope> {
 
     /// Transformed X basis vector.
     ///
-    /// See: ``basisY``, ``basisZ``, ``basisX(from:)``.
+    /// See: ``basisY``, ``basisZ``, ``basisX(from:)``, ``basis(_:)``.
     @inlinable public var basisX: Vector { KvAffineTransform3.basisX(from: matrix) }
     /// Transformed Y basis vector.
     ///
-    /// See: ``basisX``, ``basisZ``, ``basisY(from:)``.
+    /// See: ``basisX``, ``basisZ``, ``basisY(from:)``, ``basis(_:)``.
     @inlinable public var basisY: Vector { KvAffineTransform3.basisY(from: matrix) }
     /// Transformed Z basis vector.
     ///
-    /// See: ``basisX``, ``basisY``, ``basisZ(from:)``.
+    /// See: ``basisX``, ``basisY``, ``basisZ(from:)``, ``basis(_:)``.
     @inlinable public var basisZ: Vector { KvAffineTransform3.basisZ(from: matrix) }
 
 
@@ -221,6 +231,12 @@ public struct KvAffineTransform3<Math : KvMathScope> {
     ///
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable public var scale: Vector { KvAffineTransform3.scale(from: matrix) }
+
+
+    /// - Returns: Transformed basis vector for given index.
+    ///
+    /// See: ``basisX``, ``basisY``, ``basisZ``, ``basis(_:from:)``.
+    @inlinable public func basis(_ index: Int) -> Vector { KvAffineTransform3.basis(index, from: matrix) }
 
 
     /// - Returns: Tranformed normal.

@@ -130,14 +130,24 @@ public struct KvAffineTransform2<Math : KvMathScope> {
     }
 
 
-    /// Transformed X basis vector.
+    /// - Returns: Transformed basis vector for given index.
     ///
-    /// See: ``basisY(from:)``, ``basisX``.
+    /// See: ``basisX(from:)``, ``basisY(from:)``.
+    @inlinable
+    public static func basis(_ index: Int, from m: Matrix) -> Vector {
+        assert((0..<2).contains(index), "Unvalid basis vector index (\(index)) for KvAffineTransform2")
+        return m[index]
+    }
+    
+
+    /// - Returns: Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisX``, ``basis(_:from:)``.
     @inlinable public static func basisX(from m: Matrix) -> Vector { m[0] }
 
-    /// Transformed Y basis vector.
+    /// - Returns: Transformed Y basis vector.
     ///
-    /// See: ``basisX(from:)``, ``basisY``.
+    /// See: ``basisX(from:)``, ``basisY``, ``basis(_:from:)``.
     @inlinable public static func basisY(from m: Matrix) -> Vector { m[1] }
 
 
@@ -187,11 +197,11 @@ public struct KvAffineTransform2<Math : KvMathScope> {
 
     /// Transformed X basis vector.
     ///
-    /// See: ``basisY``, ``basisX(from:)``.
+    /// See: ``basisY``, ``basisX(from:)``, ``basis(_:)``.
     @inlinable public var basisX: Vector { KvAffineTransform2.basisX(from: matrix) }
     /// Transformed Y basis vector.
     ///
-    /// See: ``basisX``, ``basisY(from:)``.
+    /// See: ``basisX``, ``basisY(from:)``, ``basis(_:)``.
     @inlinable public var basisY: Vector { KvAffineTransform2.basisY(from: matrix) }
 
 
@@ -207,6 +217,12 @@ public struct KvAffineTransform2<Math : KvMathScope> {
     ///
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable public var scale: Vector { Self.scale(from: matrix) }
+
+
+    /// - Returns: Transformed basis vector for given index.
+    ///
+    /// See: ``basisX``, ``basisY``, ``basis(_:from:)``.
+    @inlinable public func basis(_ index: Int) -> Vector { KvAffineTransform2.basis(index, from: matrix) }
 
 
     /// - Returns: Tranformed normal.

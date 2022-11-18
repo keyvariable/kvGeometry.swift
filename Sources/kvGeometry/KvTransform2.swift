@@ -264,14 +264,24 @@ public struct KvTransform2<Math : KvMathScope> {
     public static func translation(from m: Matrix) -> Vector { Math.make2(m[2]) }
 
 
-    /// Transformed X basis vector.
+    /// - Returns: Transformed basis vector for given index.
     ///
-    /// See: ``basisY(from:)``, ``basisX``.
+    /// See: ``basisX(from:)``, ``basisY(from:)``.
+    @inlinable
+    public static func basis(_ index: Int, from m: Matrix) -> Vector {
+        assert((0..<2).contains(index), "Unvalid basis vector index (\(index)) for KvTransform2")
+        return Math.make2(m[index])
+    }
+
+
+    /// - Returns: Transformed X basis vector.
+    ///
+    /// See: ``basisY(from:)``, ``basisX``, ``basis(_:from:)``.
     @inlinable public static func basisX(from m: Matrix) -> Vector { Math.make2(m[0]) }
 
-    /// Transformed Y basis vector.
+    /// - Returns: Transformed Y basis vector.
     ///
-    /// See: ``basisX(from:)``, ``basisY``.
+    /// See: ``basisX(from:)``, ``basisY``, ``basis(_:from:)``.
     @inlinable public static func basisY(from m: Matrix) -> Vector { Math.make2(m[1]) }
 
 
@@ -389,11 +399,11 @@ public struct KvTransform2<Math : KvMathScope> {
 
     /// Transformed X basis vector.
     ///
-    /// See: ``basisY``, ``basisX(from:)``.
+    /// See: ``basisY``, ``basisX(from:)``, ``basis(_:)``.
     @inlinable public var basisX: Vector { KvTransform2.basisX(from: matrix) }
     /// Transformed Y basis vector.
     ///
-    /// See: ``basisX``, ``basisY(from:)``.
+    /// See: ``basisX``, ``basisY(from:)``, ``basis(_:)``.
     @inlinable public var basisY: Vector { KvTransform2.basisY(from: matrix) }
 
 
@@ -418,6 +428,12 @@ public struct KvTransform2<Math : KvMathScope> {
     ///
     /// - Warning: Assuming bottom row of the receiver's matrix is `[ 0, 0, 1 ]`.
     @inlinable public var translation: Vector { KvTransform2.translation(from: matrix) }
+
+
+    /// - Returns: Transformed basis vector for given index.
+    ///
+    /// See: ``basisX``, ``basisY``, ``basis(_:from:)``.
+    @inlinable public func basis(_ index: Int) -> Vector { KvTransform2.basis(index, from: matrix) }
 
 
     /// - Returns: Tranformed normal.
