@@ -269,32 +269,6 @@ public struct KvTransform3<Math : KvMathScope> {
     public static func translation(from m: Matrix) -> Vector { Math.make3(m[3]) }
 
 
-    /// Transformed basis vector for given index.
-    ///
-    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ(from:)``.
-    @inlinable
-    public static func basis(_ index: Int, from m: Matrix) -> Vector {
-        assert((0..<3).contains(index), "Unvalid basis vector index (\(index)) for KvTransform3")
-        return Math.make3(m[index])
-    }
-
-
-    /// Transformed X basis vector.
-    ///
-    /// See: ``basisY(from:)``, ``basisZ(from:)``, ``basisX``, ``basis(_:from:)``.
-    @inlinable public static func basisX(from m: Matrix) -> Vector { Math.make3(m[0]) }
-
-    /// Transformed Y basis vector.
-    ///
-    /// See: ``basisX(from:)``, ``basisZ(from:)``, ``basisY``, ``basis(_:from:)``.
-    @inlinable public static func basisY(from m: Matrix) -> Vector { Math.make3(m[1]) }
-
-    /// Transformed Z basis vector.
-    ///
-    /// See: ``basisX(from:)``, ``basisY(from:)``, ``basisZ``, ``basis(_:from:)``.
-    @inlinable public static func basisZ(from m: Matrix) -> Vector { Math.make3(m[2]) }
-
-
     /// - Returns: Transformed coordinate by a transformation represented as given matrix.
     @inlinable
     public static func act(_ matrix: Matrix, coordinate c: Vector) -> Vector {
@@ -452,16 +426,16 @@ public struct KvTransform3<Math : KvMathScope> {
 
     /// Transformed X basis vector.
     ///
-    /// See: ``basisY``, ``basisZ``, ``basisX(from:)``, ``basis(_:)``.
-    @inlinable public var basisX: Vector { KvTransform3.basisX(from: matrix) }
+    /// See: ``basisY``, ``basisZ``, ``Basis/x(from:)``, ``basisVector(at:)``.
+    @inlinable public var basisX: Vector { Basis.x(from: matrix) }
     /// Transformed Y basis vector.
     ///
-    /// See: ``basisX``, ``basisZ``, ``basisY(from:)``, ``basis(_:)``.
-    @inlinable public var basisY: Vector { KvTransform3.basisY(from: matrix) }
+    /// See: ``basisX``, ``basisZ``, ``Basis/y(from:)``, ``basisVector(at:)``.
+    @inlinable public var basisY: Vector { Basis.y(from: matrix) }
     /// Transformed Z basis vector.
     ///
-    /// See: ``basisX``, ``basisY``, ``basisZ(from:)``, ``basis(_:)``.
-    @inlinable public var basisZ: Vector { KvTransform3.basisZ(from: matrix) }
+    /// See: ``basisX``, ``basisY``, ``Basis/z(from:)``, ``basisVector(at:)``.
+    @inlinable public var basisZ: Vector { Basis.z(from: matrix) }
 
 
     /// A boolean value indicating whether the receiver is numerically equal to identity tranformation.
@@ -489,8 +463,8 @@ public struct KvTransform3<Math : KvMathScope> {
 
     /// - Returns: Transformed basis vector for given index.
     ///
-    /// See: ``basisX``, ``basisY``, ``basisZ``, ``basis(_:from:)``.
-    @inlinable public func basis(_ index: Int) -> Vector { KvTransform3.basis(index, from: matrix) }
+    /// See: ``basisX``, ``basisY``, ``basisZ``, ``Basis/vector(at:from:)``.
+    @inlinable public func basisVector(at index: Int) -> Vector { Basis.vector(at: index, from: matrix) }
 
 
     /// - Returns: Tranformed normal.
@@ -560,5 +534,381 @@ extension KvTransform3 : Equatable {
     @inlinable public static func ==(lhs: Self, rhs: Self) -> Bool { lhs.matrix == rhs.matrix }
 
     @inlinable public static func !=(lhs: Self, rhs: Self) -> Bool { lhs.matrix != rhs.matrix }
+
+}
+
+
+
+// MARK: .Basis
+
+extension KvTransform3 {
+
+    /// Implementation of basis in 3D coordinate space with arbitrary origin.
+    public struct Basis {
+
+        /// Basis vector.
+        public var x, y, z: Vector
+        /// Translation.
+        public var origin: Vector
+
+
+        /// Memberwise initializer.
+        @inlinable
+        public init(x: Vector, y: Vector, z: Vector, origin: Vector = .zero) {
+            self.x = x
+            self.y = y
+            self.z = z
+            self.origin = origin
+        }
+
+
+        /// Initializes trivial basis.
+        @inlinable public init() { self.init(x: .unitX, y: .unitY, z: .unitZ) }
+
+
+        /// Initializes basis with vectors in given order.
+        @inlinable
+        public init(vectors: (Vector, Vector, Vector), in order: Permutation, origin: Vector) {
+            switch order {
+            case .xyz:
+                (x, y, z) = vectors
+            case .xzy:
+                (x, z, y) = vectors
+            case .yxz:
+                (y, x, z) = vectors
+            case .yzx:
+                (y, z, x) = vectors
+            case .zxy:
+                (z, x, y) = vectors
+            case .zyx:
+                (z, y, x) = vectors
+            }
+
+            self.origin = origin
+        }
+
+
+        /// Initializes basis with vectors of given basis and origin.
+        @inlinable
+        public init(_ basis: KvAffineTransform3<Math>.Basis, origin: Vector = .zero) {
+            self.init(x: basis.x, y: basis.y, z: basis.z, origin: origin)
+        }
+
+
+        /// Extracts basis from given transformation matrix.
+        @inlinable
+        public init(_ m: Matrix) {
+            self.init(x: Basis.x(from: m), y: Basis.y(from: m), z: Basis.z(from: m), origin: KvTransform3.translation(from: m))
+        }
+
+        /// Extracts basis from given affine transformation matrix.
+        @inlinable
+        public init(_ m: KvAffineTransform3<Math>.Matrix) {
+            typealias Basis = KvAffineTransform3<Math>.Basis
+
+            self.init(x: Basis.x(from: m), y: Basis.y(from: m), z: Basis.z(from: m))
+        }
+
+
+        /// Extracts basis from given transformation.
+        @inlinable public init(_ t: KvTransform3) { self.init(t.matrix) }
+
+        /// Extracts basis from given affine transformation.
+        @inlinable public init(_ t: KvAffineTransform3<Math>) { self.init(t.matrix) }
+
+
+        // MARK: Access Auxiliaries
+
+        /// Trivial basis.
+        @inlinable public static var identity: Basis { Basis() }
+
+
+        /// - Returns: Transformed basis vector for given *index*.
+        ///
+        /// See: ``x(from:)``, ``y(from:)``, ``z(from:)``, ``setVector(_:at:in:)``.
+        @inlinable
+        public static func vector(at index: Int, from m: Matrix) -> Vector {
+            assert((0..<3).contains(index), "Invalid basis vector index (\(index)) for KvTransform3")
+            return Math.make3(m[index])
+        }
+
+
+        /// Replaces basis vector at given *index* in given *matrix* with given *vector*.
+        ///
+        /// See: ``setX(in:)``, ``setY(in:)``, ``setZ(in:)``, ``vector(at:from:)``.
+        @inlinable
+        public static func setVector(_ v: Vector, at index: Int, in m: inout Matrix) {
+            assert((0..<3).contains(index), "Invalid basis vector index (\(index)) for KvTransform3")
+            m[index] = Math.make4(v)
+        }
+
+
+        /// - Returns: Transformed X basis vector.
+        ///
+        /// See: ``y(from:)``, ``z(from:)``, ``setX(_:in:)``, ``vector(at:from:)``.
+        @inlinable public static func x(from m: Matrix) -> Vector { Math.make3(m[0]) }
+
+
+        /// - Returns: Transformed Y basis vector.
+        ///
+        /// See: ``x(from:)``, ``z(from:)``, ``setY(_:in:)``, ``vector(at:from:)``.
+        @inlinable public static func y(from m: Matrix) -> Vector { Math.make3(m[1]) }
+
+
+        /// - Returns: Transformed Z basis vector.
+        ///
+        /// See: ``x(from:)``, ``y(from:)``, ``setZ(_:in:)``, ``vector(at:from:)``.
+        @inlinable public static func z(from m: Matrix) -> Vector { Math.make3(m[2]) }
+
+
+        /// Replaces X basis vector in given *matrix* with given value.
+        ///
+        /// See: ``setY(_:in:)``, ``setZ(_:in:)``, ``x(from:)``, ``setVector(_:at:in:)``.
+        @inlinable public static func setX(_ v: Vector, in m: inout Matrix) { m[0] = Math.make4(v) }
+
+
+        /// Replaces Y basis vector in given *matrix* with given value.
+        ///
+        /// See: ``setX(_:in:)``, ``setZ(_:in:)``, ``y(from:)``, ``setVector(_:at:in:)``.
+        @inlinable public static func setY(_ v: Vector, in m: inout Matrix) { m[1] = Math.make4(v) }
+
+
+        /// Replaces Z basis vector in given *matrix* with given value.
+        ///
+        /// See: ``setX(_:in:)``, ``setY(_:in:)``, ``z(from:)``, ``setVector(_:at:in:)``.
+        @inlinable public static func setZ(_ v: Vector, in m: inout Matrix) { m[2] = Math.make4(v) }
+
+
+        // MARK: Orthogonalization Auxiliaries
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process).
+        @inlinable
+        public static func orthogonalized(vectors v: (Vector, Vector, Vector)) -> (Vector, Vector, Vector) {
+            let v0 = v.0
+            let l0⁻² = 1 / Math.length²(v0)
+
+            let v1 = v.1 - v0 * (Math.dot(v0, v.1) * l0⁻²)
+            var v2 = v.2 - v0 * (Math.dot(v0, v.2) * l0⁻²)
+
+            v2 = v2 - v1 * (Math.dot(v1, v2) / Math.length²(v1))
+
+            return (v0, v1, v2)
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process).
+        @inlinable
+        public static func safeOrthogonalized(vectors v: (Vector, Vector, Vector)) -> (Vector, Vector, Vector)? {
+            let v0 = v.0
+            let l0² = Math.length²(v.0)
+
+            guard KvIsNonzero(l0², eps: .zero²) else { return nil }
+
+            let l0⁻² = 1 / l0²
+
+            let v1 = v.1 - v0 * (Math.dot(v0, v.1) * l0⁻²)
+            let l1² = Math.length²(v1)
+
+            guard KvIsNonzero(l1², eps: .zero²) else { return nil }
+
+            var v2 = v.2 - v0 * (Math.dot(v0, v.2) * l0⁻²)
+
+            v2 = v2 - v1 * (Math.dot(v1, v2) / l1²)
+
+            return (v0, v1, v2)
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) where each vector is normalized.
+        @inlinable
+        public static func orthonormalized(vectors v: (Vector, Vector, Vector)) -> (Vector, Vector, Vector) {
+            let u0 = Math.normalize(v.0)
+            let u1 = Math.normalize(v.1 - u0 * (Math.dot(u0, v.1)))
+
+            let v2 = v.2 - u0 * Math.dot(u0, v.2)
+            let u2 = Math.normalize(v2 - u1 * Math.dot(u1, v2))
+
+            return (u0, u1, u2)
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) where each vector is normalized.
+        ///            `Nil` is returned if any of vectors becomes degenerate.
+        @inlinable
+        public static func safeOrthonormalized(vectors v: (Vector, Vector, Vector)) -> (Vector, Vector, Vector)? {
+            guard let u0 = Math.safeNormalize(v.0),
+                  let u1 = Math.safeNormalize(v.1 - u0 * (Math.dot(u0, v.1)))
+            else { return nil }
+
+            let v2 = v.2 - u0 * Math.dot(u0, v.2)
+
+            guard let u2 = Math.safeNormalize(v2 - u1 * Math.dot(u1, v2)) else { return nil }
+
+            return (u0, u1, u2)
+        }
+
+
+        // MARK: Subscripts
+
+        /// Provides access to the receiver's vectors in given *order*.
+        @inlinable
+        public subscript(order: Permutation) -> (Vector, Vector, Vector) {
+            get {
+                switch order {
+                case .xyz:
+                    return (x, y, z)
+                case .xzy:
+                    return (x, z, y)
+                case .yxz:
+                    return (y, x, z)
+                case .yzx:
+                    return (y, z, x)
+                case .zxy:
+                    return (z, x, y)
+                case .zyx:
+                    return (z, y, x)
+                }
+            }
+            set {
+                switch order {
+                case .xyz:
+                    (x, y, z) = newValue
+                case .xzy:
+                    (x, z, y) = newValue
+                case .yxz:
+                    (y, x, z) = newValue
+                case .yzx:
+                    (y, z, x) = newValue
+                case .zxy:
+                    (z, x, y) = newValue
+                case .zyx:
+                    (z, y, x) = newValue
+                }
+            }
+        }
+
+
+        // MARK: Operations
+
+        /// A boolean value indicating whether the receiver is degenerate.
+        @inlinable
+        public var isDegenerate: Bool {
+            let m = matrix
+            return KvIsZero(m.determinant, eps: Math.epsArg(m).tolerance)
+        }
+
+        /// A boolean value indicating whether all the receiver's vectors are of unit length.
+        @inlinable public var isNormalized: Bool { Math.isUnit(x) && Math.isUnit(y) }
+
+        /// A boolean value indicating wheter the receiiver is orthogonal.
+        @inlinable public var isOrthogonal: Bool { Math.isOrthogonal(x, y) }
+
+
+        /// Matrix representation of the receiver.
+        ///
+        /// See: ``transform``.
+        @inlinable public var matrix: Matrix { Matrix(Math.make4(x), Math.make4(y), Math.make4(z), Matrix.Column(origin, 1)) }
+
+        /// *KvTransform2* representation of the receiver.
+        ///
+        /// See: ``matrix``.
+        @inlinable public var transform: KvTransform3 { KvTransform3(matrix) }
+
+
+        /// Normalizes the receiver's vectors.
+        ///
+        /// See: ``normalized()``.
+        @inlinable
+        public mutating func normalize() {
+            x = Math.normalize(x)
+            y = Math.normalize(y)
+            z = Math.normalize(z)
+        }
+
+
+        /// - Returns: A copy of the receiver where the vectors are normalized.
+        ///
+        /// See: ``normalize()``, ``safeNormalized()``.
+        @inlinable public func normalized() -> Basis { Basis(x: Math.normalize(x), y: Math.normalize(y), z: Math.normalize(z), origin: origin) }
+
+
+        /// - Returns: A copy of the receiver where all the vectors are normalized if nonzero. If any vector is zero then `nil` is returned.
+        ///
+        /// See: ``normalized()``.
+        @inlinable
+        public func safeNormalized() -> Basis? {
+            guard let x = Math.safeNormalize(x),
+                  let y = Math.safeNormalize(y),
+                  let z = Math.safeNormalize(z)
+            else { return nil }
+
+            return Basis(x: x, y: y, z: z, origin: origin)
+        }
+
+
+        /// Applies [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) in given *order* to the receiver.
+        ///
+        /// See: ``orthogonalized(order:)``.
+        @inlinable
+        public mutating func orthogonalize(order: Permutation = .xyz) {
+            _ = { Basis.orthogonalized(vectors: $0) }(&self[order])
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///
+        /// See: ``orthogonalize(order:)``, ``safeOrthogonalized(order:)``.
+        @inlinable
+        public func orthogonalized(order: Permutation = .xyz) -> Basis {
+            Basis(vectors: Basis.orthogonalized(vectors: self[order]), in: order, origin: origin)
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///            `Nil` is returned when zero vector occurs.
+        ///
+        /// See: ``orthogonalized(order:)``.
+        @inlinable
+        public func safeOrthogonalized(order: Permutation = .xyz) -> Basis? {
+            Basis.safeOrthogonalized(vectors: self[order])
+                .map { Basis(vectors: $0, in: order, origin: origin) }
+        }
+
+
+        /// Applies [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) in given *order* and normalizes to the receiver.
+        ///
+        /// See: ``orthonormalized(order:)``.
+        @inlinable
+        public mutating func orthonormalize(order: Permutation = .xyz) {
+            _ = { Basis.orthonormalized(vectors: $0) }(&self[order])
+        }
+
+
+        /// - Returns: The normalized result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///
+        /// See: ``orthonormalize(order:)``, ``safeOrthonormalized(order:)``.
+        @inlinable
+        public func orthonormalized(order: Permutation = .xyz) -> Basis {
+            Basis(vectors: Basis.orthonormalized(vectors: self[order]), in: order, origin: origin)
+        }
+
+
+        /// - Returns: The normalized result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///            `Nil` is returned when zero vector occurs.
+        ///
+        /// See: ``orthonormalized(order:)``.
+        @inlinable
+        public func safeOrthonormalized(order: Permutation = .xyz) -> Basis? {
+            Basis.safeOrthonormalized(vectors: self[order])
+                .map { Basis(vectors: $0, in: order, origin: origin) }
+        }
+
+
+        // MARK: .Permutation
+
+        /// Permutation of 3D basis vectors.
+        public enum Permutation { case xyz, xzy, yxz, yzx, zxy, zyx }
+
+    }
 
 }
