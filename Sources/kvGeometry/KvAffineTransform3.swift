@@ -474,7 +474,7 @@ extension KvAffineTransform3 {
         /// See: ``orthogonalized(order:)``.
         @inlinable
         public mutating func orthogonalize(order: Permutation = .xyz) {
-            _ = { Basis.orthogonalized(vectors: $0) }(&self[order])
+            _ = { $0 = Basis.orthogonalized(vectors: $0) }(&self[order])
         }
 
 
@@ -503,7 +503,7 @@ extension KvAffineTransform3 {
         /// See: ``orthonormalized(order:)``.
         @inlinable
         public mutating func orthonormalize(order: Permutation = .xyz) {
-            _ = { Basis.orthonormalized(vectors: $0) }(&self[order])
+            _ = { $0 = Basis.orthonormalized(vectors: $0) }(&self[order])
         }
 
 
@@ -538,7 +538,7 @@ extension KvAffineTransform3 {
         }
 
         /// A boolean value indicating whether all the receiver's vectors are of unit length.
-        @inlinable public var isNormalized: Bool { Math.isUnit(x) && Math.isUnit(y) }
+        @inlinable public var isNormalized: Bool { Math.isUnit(x) && Math.isUnit(y) && Math.isUnit(z) }
 
         /// A boolean value indicating wheter the receiiver is orthogonal.
         @inlinable public var isOrthogonal: Bool { Math.isOrthogonal(x, y) && Math.isOrthogonal(x, z) && Math.isOrthogonal(y, z) }

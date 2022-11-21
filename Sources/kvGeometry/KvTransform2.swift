@@ -696,7 +696,7 @@ extension KvTransform2 {
         /// See: ``orthogonalized(order:)``.
         @inlinable
         public mutating func orthogonalize(order: Permutation = .xy) {
-            _ = { Basis.orthogonalized(vectors: $0) }(&self[order])
+            _ = { $0 = Basis.orthogonalized(vectors: $0) }(&self[order])
         }
 
 
@@ -725,7 +725,7 @@ extension KvTransform2 {
         /// See: ``orthonormalized(order:)``.
         @inlinable
         public mutating func orthonormalize(order: Permutation = .xy) {
-            _ = { Basis.orthonormalized(vectors: $0) }(&self[order])
+            _ = { $0 = Basis.orthonormalized(vectors: $0) }(&self[order])
         }
 
 
