@@ -880,7 +880,7 @@ extension KvTransform3 {
         /// A boolean value indicating whether the receiver is degenerate.
         @inlinable
         public var isDegenerate: Bool {
-            let m = matrix
+            let m = Math.Matrix3x3(x, y, z)
             return KvIsZero(m.determinant, eps: Math.epsArg(m).tolerance)
         }
 
