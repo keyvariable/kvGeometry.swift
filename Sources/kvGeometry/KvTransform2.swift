@@ -663,7 +663,7 @@ extension KvTransform2 {
         public static func safeOrthogonalized(vectors v: (Vector, Vector)) -> (Vector, Vector)? {
             let l0² = Math.length²(v.0)
 
-            guard KvIsNonzero(l0², eps: .zero²) else { return nil }
+            guard KvIsNonzero(l0²) else { return nil }
 
             let v1 = v.1 - v.0 * (Math.dot(v.0, v.1) / l0²)
 

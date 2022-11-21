@@ -770,14 +770,14 @@ extension KvTransform3 {
             let v0 = v.0
             let l0² = Math.length²(v.0)
 
-            guard KvIsNonzero(l0², eps: .zero²) else { return nil }
+            guard KvIsNonzero(l0²) else { return nil }
 
             let l0⁻² = 1 / l0²
 
             let v1 = v.1 - v0 * (Math.dot(v0, v.1) * l0⁻²)
             let l1² = Math.length²(v1)
 
-            guard KvIsNonzero(l1², eps: .zero²) else { return nil }
+            guard KvIsNonzero(l1²) else { return nil }
 
             var v2 = v.2 - v0 * (Math.dot(v0, v.2) * l0⁻²)
 
