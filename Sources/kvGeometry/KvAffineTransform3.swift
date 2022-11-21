@@ -269,8 +269,10 @@ extension KvAffineTransform3 {
         public typealias Permutation = KvTransform3<Math>.Basis.Permutation
 
 
+
         /// Basis vector.
         public var x, y, z: Vector
+
 
 
         /// Memberwise initializer.
@@ -315,6 +317,22 @@ extension KvAffineTransform3 {
 
         /// Extracts basis from given affine transformation.
         @inlinable public init(_ t: KvAffineTransform3) { self.init(t.matrix) }
+
+
+
+        // MARK: Completion
+
+        /// - Returns: A left-handed basis where z = *x* × *y*.
+        @inlinable public static func completeLH(x: Vector, y: Vector) -> Basis { Basis(x: x, y: y, z: Math.cross(x, y)) }
+
+
+        /// - Returns: A left-handed basis where y = *z* × *x*.
+        @inlinable public static func completeLH(x: Vector, z: Vector) -> Basis { Basis(x: x, y: Math.cross(z, x), z: z) }
+
+
+        /// - Returns: A left-handed basis where x = *y* × *z*.
+        @inlinable public static func completeLH(y: Vector, z: Vector) -> Basis { Basis(x: Math.cross(y, z), y: y, z: z) }
+
 
 
         // MARK: Access Auxiliaries
@@ -377,6 +395,7 @@ extension KvAffineTransform3 {
         ///
         /// See: ``setX(_:in:)``, ``setY(_:in:)``, ``z(from:)``, ``setVector(_:at:in:)``.
         @inlinable public static func setZ(_ v: Vector, in m: inout Matrix) { m[2] = v }
+
 
 
         // MARK: Orthogonalization Auxiliaries
@@ -448,6 +467,7 @@ extension KvAffineTransform3 {
                 }
             }
         }
+
 
 
         // MARK: Operations

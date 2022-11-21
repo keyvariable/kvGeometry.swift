@@ -260,8 +260,10 @@ extension KvAffineTransform2 {
         public typealias Permutation = KvTransform2<Math>.Basis.Permutation
 
 
+
         /// Basis vector.
         public var x, y: Vector
+
 
 
         /// Memberwise initializer.
@@ -297,6 +299,22 @@ extension KvAffineTransform2 {
 
         /// Extracts basis from given affine transformation.
         @inlinable public init(_ t: KvAffineTransform2<Math>) { self.init(t.matrix) }
+
+
+
+        // MARK: Completion
+
+        /// - Returns: An orthogonal left-handed basis where Y vector is calculated for given X vector.
+        ///
+        /// - Note: Y vector has the same length as *x*.
+        @inlinable public static func completeLH(x: Vector) -> Basis { Basis(x: x, y: Vector(-x.y, x.x)) }
+
+
+        /// - Returns: An orthogonal left-handed basis where X vector is calculated for given Y vector.
+        ///
+        /// - Note: X vector has the same length as *y*.
+        @inlinable public static func completeLH(y: Vector) -> Basis { Basis(x: Vector(y.y, -y.x), y: y) }
+
 
 
         // MARK: Access Auxiliaries
@@ -349,6 +367,7 @@ extension KvAffineTransform2 {
         @inlinable public static func setY(_ v: Vector, in m: inout Matrix) { m[1] = v }
 
 
+
         // MARK: Orthogonalization Auxiliaries
 
         /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process).
@@ -380,6 +399,7 @@ extension KvAffineTransform2 {
         }
 
 
+
         // MARK: Subscripts
 
         /// Provides access to the receiver's vectors in given *order*.
@@ -403,6 +423,7 @@ extension KvAffineTransform2 {
             }
         }
 
+        
 
         // MARK: Operations
 

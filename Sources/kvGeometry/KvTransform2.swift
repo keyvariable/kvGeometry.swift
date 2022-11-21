@@ -500,6 +500,7 @@ extension KvTransform2 {
         public var origin: Vector
 
 
+
         /// Memberwise initializer.
         @inlinable
         public init(x: Vector, y: Vector, origin: Vector = .zero) {
@@ -556,6 +557,22 @@ extension KvTransform2 {
         @inlinable public init(_ t: KvAffineTransform2<Math>) { self.init(t.matrix) }
 
 
+
+        // MARK: Completion
+
+        /// - Returns: An orthogonal left-handed basis where Y vector is calculated for given X vector.
+        ///
+        /// - Note: Y vector has the same length as *x*.
+        @inlinable public static func completeLH(x: Vector, origin: Vector = .zero) -> Basis { Basis(x: x, y: Vector(-x.y, x.x), origin: origin) }
+
+
+        /// - Returns: An orthogonal left-handed basis where X vector is calculated for given Y vector.
+        ///
+        /// - Note: X vector has the same length as *y*.
+        @inlinable public static func completeLH(y: Vector, origin: Vector = .zero) -> Basis { Basis(x: Vector(y.y, -y.x), y: y, origin: origin) }
+
+
+
         // MARK: Access Auxiliaries
 
         /// Trivial basis.
@@ -606,6 +623,7 @@ extension KvTransform2 {
         @inlinable public static func setY(_ v: Vector, in m: inout Matrix) { m[1] = Math.make3(v) }
 
 
+
         // MARK: Orthogonalization Auxiliaries
 
         /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process).
@@ -648,6 +666,7 @@ extension KvTransform2 {
         }
 
 
+
         // MARK: Subscripts
 
         /// Provides access to the receiver's vectors in given *order*.
@@ -670,6 +689,7 @@ extension KvTransform2 {
                 }
             }
         }
+
 
 
         // MARK: Operations
@@ -785,6 +805,7 @@ extension KvTransform2 {
                 .map { Basis(vectors: $0, in: order, origin: origin) }
         }
 
+        
 
         // MARK: .Permutation
 

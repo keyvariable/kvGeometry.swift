@@ -552,6 +552,7 @@ extension KvTransform3 {
         public var origin: Vector
 
 
+
         /// Memberwise initializer.
         @inlinable
         public init(x: Vector, y: Vector, z: Vector, origin: Vector = .zero) {
@@ -617,6 +618,31 @@ extension KvTransform3 {
         @inlinable public init(_ t: KvAffineTransform3<Math>) { self.init(t.matrix) }
 
 
+
+        // MARK: Completion
+
+        /// - Returns: A left-handed basis where z = *x* × *y*.
+        @inlinable
+        public static func completeLH(x: Vector, y: Vector, origin: Vector = .zero) -> Basis {
+            Basis(x: x, y: y, z: Math.cross(x, y), origin: origin)
+        }
+
+
+        /// - Returns: A left-handed basis where y = *z* × *x*.
+        @inlinable
+        public static func completeLH(x: Vector, z: Vector, origin: Vector = .zero) -> Basis {
+            Basis(x: x, y: Math.cross(z, x), z: z, origin: origin)
+        }
+
+
+        /// - Returns: A left-handed basis where x = *y* × *z*.
+        @inlinable
+        public static func completeLH(y: Vector, z: Vector, origin: Vector = .zero) -> Basis {
+            Basis(x: Math.cross(y, z), y: y, z: z, origin: origin)
+        }
+
+
+
         // MARK: Access Auxiliaries
 
         /// Trivial basis.
@@ -677,6 +703,7 @@ extension KvTransform3 {
         ///
         /// See: ``setX(_:in:)``, ``setY(_:in:)``, ``z(from:)``, ``setVector(_:at:in:)``.
         @inlinable public static func setZ(_ v: Vector, in m: inout Matrix) { m[2] = Math.make4(v) }
+
 
 
         // MARK: Orthogonalization Auxiliaries
@@ -748,6 +775,7 @@ extension KvTransform3 {
         }
 
 
+
         // MARK: Subscripts
 
         /// Provides access to the receiver's vectors in given *order*.
@@ -786,6 +814,7 @@ extension KvTransform3 {
                 }
             }
         }
+
 
 
         // MARK: Operations
@@ -902,6 +931,7 @@ extension KvTransform3 {
             Basis.safeOrthonormalized(vectors: self[order])
                 .map { Basis(vectors: $0, in: order, origin: origin) }
         }
+
 
 
         // MARK: .Permutation
