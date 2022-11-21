@@ -619,6 +619,47 @@ extension KvTransform3 {
 
 
 
+        // MARK: Subscripts
+
+        /// Provides access to the receiver's vectors in given *order*.
+        @inlinable
+        public subscript(order: Permutation) -> (Vector, Vector, Vector) {
+            get {
+                switch order {
+                case .xyz:
+                    return (x, y, z)
+                case .xzy:
+                    return (x, z, y)
+                case .yxz:
+                    return (y, x, z)
+                case .yzx:
+                    return (y, z, x)
+                case .zxy:
+                    return (z, x, y)
+                case .zyx:
+                    return (z, y, x)
+                }
+            }
+            set {
+                switch order {
+                case .xyz:
+                    (x, y, z) = newValue
+                case .xzy:
+                    (x, z, y) = newValue
+                case .yxz:
+                    (y, x, z) = newValue
+                case .yzx:
+                    (y, z, x) = newValue
+                case .zxy:
+                    (z, x, y) = newValue
+                case .zyx:
+                    (z, y, x) = newValue
+                }
+            }
+        }
+
+
+
         // MARK: Completion
 
         /// - Returns: A left-handed basis where z = *x* × *y*.
@@ -643,7 +684,7 @@ extension KvTransform3 {
 
 
 
-        // MARK: Access Auxiliaries
+        // MARK: Access
 
         /// Trivial basis.
         @inlinable public static var identity: Basis { Basis() }
@@ -706,7 +747,7 @@ extension KvTransform3 {
 
 
 
-        // MARK: Orthogonalization Auxiliaries
+        // MARK: Orthogonalization
 
         /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process).
         @inlinable
@@ -775,44 +816,61 @@ extension KvTransform3 {
         }
 
 
-
-        // MARK: Subscripts
-
-        /// Provides access to the receiver's vectors in given *order*.
+        /// Applies [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) in given *order* to the receiver.
+        ///
+        /// See: ``orthogonalized(order:)``.
         @inlinable
-        public subscript(order: Permutation) -> (Vector, Vector, Vector) {
-            get {
-                switch order {
-                case .xyz:
-                    return (x, y, z)
-                case .xzy:
-                    return (x, z, y)
-                case .yxz:
-                    return (y, x, z)
-                case .yzx:
-                    return (y, z, x)
-                case .zxy:
-                    return (z, x, y)
-                case .zyx:
-                    return (z, y, x)
-                }
-            }
-            set {
-                switch order {
-                case .xyz:
-                    (x, y, z) = newValue
-                case .xzy:
-                    (x, z, y) = newValue
-                case .yxz:
-                    (y, x, z) = newValue
-                case .yzx:
-                    (y, z, x) = newValue
-                case .zxy:
-                    (z, x, y) = newValue
-                case .zyx:
-                    (z, y, x) = newValue
-                }
-            }
+        public mutating func orthogonalize(order: Permutation = .xyz) {
+            _ = { Basis.orthogonalized(vectors: $0) }(&self[order])
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///
+        /// See: ``orthogonalize(order:)``, ``safeOrthogonalized(order:)``.
+        @inlinable
+        public func orthogonalized(order: Permutation = .xyz) -> Basis {
+            Basis(vectors: Basis.orthogonalized(vectors: self[order]), in: order, origin: origin)
+        }
+
+
+        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///            `Nil` is returned when zero vector occurs.
+        ///
+        /// See: ``orthogonalized(order:)``.
+        @inlinable
+        public func safeOrthogonalized(order: Permutation = .xyz) -> Basis? {
+            Basis.safeOrthogonalized(vectors: self[order])
+                .map { Basis(vectors: $0, in: order, origin: origin) }
+        }
+
+
+        /// Applies [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) in given *order* and normalizes to the receiver.
+        ///
+        /// See: ``orthonormalized(order:)``.
+        @inlinable
+        public mutating func orthonormalize(order: Permutation = .xyz) {
+            _ = { Basis.orthonormalized(vectors: $0) }(&self[order])
+        }
+
+
+        /// - Returns: The normalized result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///
+        /// See: ``orthonormalize(order:)``, ``safeOrthonormalized(order:)``.
+        @inlinable
+        public func orthonormalized(order: Permutation = .xyz) -> Basis {
+            Basis(vectors: Basis.orthonormalized(vectors: self[order]), in: order, origin: origin)
+        }
+
+
+        /// - Returns: The normalized result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
+        ///            `Nil` is returned when zero vector occurs.
+        ///
+        /// See: ``orthonormalized(order:)``.
+        @inlinable
+        public func safeOrthonormalized(order: Permutation = .xyz) -> Basis? {
+            Basis.safeOrthonormalized(vectors: self[order])
+                .map { Basis(vectors: $0, in: order, origin: origin) }
         }
 
 
@@ -872,64 +930,6 @@ extension KvTransform3 {
             else { return nil }
 
             return Basis(x: x, y: y, z: z, origin: origin)
-        }
-
-
-        /// Applies [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) in given *order* to the receiver.
-        ///
-        /// See: ``orthogonalized(order:)``.
-        @inlinable
-        public mutating func orthogonalize(order: Permutation = .xyz) {
-            _ = { Basis.orthogonalized(vectors: $0) }(&self[order])
-        }
-
-
-        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
-        ///
-        /// See: ``orthogonalize(order:)``, ``safeOrthogonalized(order:)``.
-        @inlinable
-        public func orthogonalized(order: Permutation = .xyz) -> Basis {
-            Basis(vectors: Basis.orthogonalized(vectors: self[order]), in: order, origin: origin)
-        }
-
-
-        /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
-        ///            `Nil` is returned when zero vector occurs.
-        ///
-        /// See: ``orthogonalized(order:)``.
-        @inlinable
-        public func safeOrthogonalized(order: Permutation = .xyz) -> Basis? {
-            Basis.safeOrthogonalized(vectors: self[order])
-                .map { Basis(vectors: $0, in: order, origin: origin) }
-        }
-
-
-        /// Applies [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) in given *order* and normalizes to the receiver.
-        ///
-        /// See: ``orthonormalized(order:)``.
-        @inlinable
-        public mutating func orthonormalize(order: Permutation = .xyz) {
-            _ = { Basis.orthonormalized(vectors: $0) }(&self[order])
-        }
-
-
-        /// - Returns: The normalized result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
-        ///
-        /// See: ``orthonormalize(order:)``, ``safeOrthonormalized(order:)``.
-        @inlinable
-        public func orthonormalized(order: Permutation = .xyz) -> Basis {
-            Basis(vectors: Basis.orthonormalized(vectors: self[order]), in: order, origin: origin)
-        }
-
-
-        /// - Returns: The normalized result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process) applied to the receiver's vectors in given *order*.
-        ///            `Nil` is returned when zero vector occurs.
-        ///
-        /// See: ``orthonormalized(order:)``.
-        @inlinable
-        public func safeOrthonormalized(order: Permutation = .xyz) -> Basis? {
-            Basis.safeOrthonormalized(vectors: self[order])
-                .map { Basis(vectors: $0, in: order, origin: origin) }
         }
 
 

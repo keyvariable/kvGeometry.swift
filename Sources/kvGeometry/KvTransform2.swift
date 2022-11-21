@@ -558,6 +558,31 @@ extension KvTransform2 {
 
 
 
+        // MARK: Subscripts
+
+        /// Provides access to the receiver's vectors in given *order*.
+        @inlinable
+        public subscript(order: Permutation) -> (Vector, Vector) {
+            get {
+                switch order {
+                case .xy:
+                    return (x, y)
+                case .yx:
+                    return (y, x)
+                }
+            }
+            set {
+                switch order {
+                case .xy:
+                    (x, y) = newValue
+                case .yx:
+                    (y, x) = newValue
+                }
+            }
+        }
+
+
+
         // MARK: Completion
 
         /// - Returns: An orthogonal left-handed basis where Y vector is calculated for given X vector.
@@ -573,7 +598,7 @@ extension KvTransform2 {
 
 
 
-        // MARK: Access Auxiliaries
+        // MARK: Access
 
         /// Trivial basis.
         @inlinable public static var identity: Basis { Basis() }
@@ -624,7 +649,7 @@ extension KvTransform2 {
 
 
 
-        // MARK: Orthogonalization Auxiliaries
+        // MARK: Orthogonalization
 
         /// - Returns: The result of [modified Gram–Schmidt process](https://en.wikipedia.org/wiki/Gram–Schmidt_process).
         @inlinable
@@ -663,88 +688,6 @@ extension KvTransform2 {
             else { return nil }
 
             return (u0, u1)
-        }
-
-
-
-        // MARK: Subscripts
-
-        /// Provides access to the receiver's vectors in given *order*.
-        @inlinable
-        public subscript(order: Permutation) -> (Vector, Vector) {
-            get {
-                switch order {
-                case .xy:
-                    return (x, y)
-                case .yx:
-                    return (y, x)
-                }
-            }
-            set {
-                switch order {
-                case .xy:
-                    (x, y) = newValue
-                case .yx:
-                    (y, x) = newValue
-                }
-            }
-        }
-
-
-
-        // MARK: Operations
-
-        /// A boolean value indicating whether the receiver is degenerate.
-        @inlinable
-        public var isDegenerate: Bool {
-            let m = matrix
-            return KvIsZero(m.determinant, eps: Math.epsArg(m).tolerance)
-        }
-
-        /// A boolean value indicating whether all the receiver's vectors are of unit length.
-        @inlinable public var isNormalized: Bool { Math.isUnit(x) && Math.isUnit(y) }
-
-        /// A boolean value indicating wheter the receiiver is orthogonal.
-        @inlinable public var isOrthogonal: Bool { Math.isOrthogonal(x, y) }
-
-
-        /// Matrix representation of the receiver.
-        ///
-        /// See: ``transform``.
-        @inlinable public var matrix: Matrix { Matrix(Math.make3(x), Math.make3(y), Matrix.Column(origin, 1)) }
-
-        /// *KvTransform2* representation of the receiver.
-        ///
-        /// See: ``matrix``.
-        @inlinable public var transform: KvTransform2 { KvTransform2(matrix) }
-
-
-        /// Normalizes the receiver's vectors.
-        ///
-        /// See: ``normalized()``.
-        @inlinable
-        public mutating func normalize() {
-            x = Math.normalize(x)
-            y = Math.normalize(y)
-        }
-
-
-        /// - Returns: A copy of the receiver where the vectors are normalized.
-        ///
-        /// See: ``normalize()``, ``safeNormalized()``.
-        @inlinable public func normalized() -> Basis { Basis(x: Math.normalize(x), y: Math.normalize(y), origin: origin) }
-
-
-        /// - Returns: A copy of the receiver where all the vectors are normalized if nonzero. If any vector is zero then `nil` is returned.
-        ///
-        /// See: ``normalized()``.
-        @inlinable
-        public func safeNormalized() -> Basis? {
-            guard let x = Math.safeNormalize(x),
-                  let y = Math.safeNormalize(y)
-            else { return nil }
-
-            return Basis(x: x, y: y, origin: origin)
         }
 
 
@@ -803,6 +746,63 @@ extension KvTransform2 {
         public func safeOrthonormalized(order: Permutation = .xy) -> Basis? {
             Basis.safeOrthonormalized(vectors: self[order])
                 .map { Basis(vectors: $0, in: order, origin: origin) }
+        }
+
+
+
+        // MARK: Operations
+
+        /// A boolean value indicating whether the receiver is degenerate.
+        @inlinable
+        public var isDegenerate: Bool {
+            let m = matrix
+            return KvIsZero(m.determinant, eps: Math.epsArg(m).tolerance)
+        }
+
+        /// A boolean value indicating whether all the receiver's vectors are of unit length.
+        @inlinable public var isNormalized: Bool { Math.isUnit(x) && Math.isUnit(y) }
+
+        /// A boolean value indicating wheter the receiiver is orthogonal.
+        @inlinable public var isOrthogonal: Bool { Math.isOrthogonal(x, y) }
+
+
+        /// Matrix representation of the receiver.
+        ///
+        /// See: ``transform``.
+        @inlinable public var matrix: Matrix { Matrix(Math.make3(x), Math.make3(y), Matrix.Column(origin, 1)) }
+
+        /// *KvTransform2* representation of the receiver.
+        ///
+        /// See: ``matrix``.
+        @inlinable public var transform: KvTransform2 { KvTransform2(matrix) }
+
+
+        /// Normalizes the receiver's vectors.
+        ///
+        /// See: ``normalized()``.
+        @inlinable
+        public mutating func normalize() {
+            x = Math.normalize(x)
+            y = Math.normalize(y)
+        }
+
+
+        /// - Returns: A copy of the receiver where the vectors are normalized.
+        ///
+        /// See: ``normalize()``, ``safeNormalized()``.
+        @inlinable public func normalized() -> Basis { Basis(x: Math.normalize(x), y: Math.normalize(y), origin: origin) }
+
+
+        /// - Returns: A copy of the receiver where all the vectors are normalized if nonzero. If any vector is zero then `nil` is returned.
+        ///
+        /// See: ``normalized()``.
+        @inlinable
+        public func safeNormalized() -> Basis? {
+            guard let x = Math.safeNormalize(x),
+                  let y = Math.safeNormalize(y)
+            else { return nil }
+
+            return Basis(x: x, y: y, origin: origin)
         }
 
         
