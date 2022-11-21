@@ -888,7 +888,7 @@ extension KvTransform3 {
         @inlinable public var isNormalized: Bool { Math.isUnit(x) && Math.isUnit(y) }
 
         /// A boolean value indicating wheter the receiiver is orthogonal.
-        @inlinable public var isOrthogonal: Bool { Math.isOrthogonal(x, y) }
+        @inlinable public var isOrthogonal: Bool { Math.isOrthogonal(x, y) && Math.isOrthogonal(x, z) && Math.isOrthogonal(y, z) }
 
 
         /// Matrix representation of the receiver.
