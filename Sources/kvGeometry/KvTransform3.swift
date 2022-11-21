@@ -783,6 +783,8 @@ extension KvTransform3 {
 
             v2 = v2 - v1 * (Math.dot(v1, v2) / l1²)
 
+            guard Math.isNonzero(v2) else { return nil }
+
             return (v0, v1, v2)
         }
 

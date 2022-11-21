@@ -665,7 +665,11 @@ extension KvTransform2 {
 
             guard KvIsNonzero(l0², eps: .zero²) else { return nil }
 
-            return (v.0, v.1 - v.0 * (Math.dot(v.0, v.1) / l0²))
+            let v1 = v.1 - v.0 * (Math.dot(v.0, v.1) / l0²)
+
+            guard Math.isNonzero(v1) else { return nil }
+
+            return (v.0, v1)
         }
 
 
