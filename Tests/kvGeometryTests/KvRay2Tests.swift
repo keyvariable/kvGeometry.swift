@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -60,7 +60,7 @@ class KvRay2Tests : XCTestCase {
             let ray = Ray<Math>(in: .one, at: .init(.unitY))
 
             func Assert(_ other: Ray<Math>, _ expected: Math.Scalar?) {
-                KvAssertEqual(ray.offset(to: other), expected, by: KvIs(_:equalTo:))
+                KvAssertEqual(ray.step(to: other), expected, by: KvIs(_:equalTo:))
             }
 
             Assert(ray, nil)

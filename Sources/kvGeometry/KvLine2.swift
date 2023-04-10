@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -73,10 +73,20 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable public init(_ c0: Coordinate, _ c1: Coordinate) { self.init(in: c1 - c0, at: c0) }
 
 
+    /// A line containing both *v0* and *v1* vertices.
+    ///
+    /// - Note: Resulting line is degenerate when coordinates of *v0* and *v1* are equal.
+    @inlinable
+    public init<V0, V1>(_ v0: V0, _ v1: V1)
+    where V0 : KvVertex2Protocol, V0.Math == Math, V1 : KvVertex2Protocol, V1.Math == Math {
+        self.init(in: v1.coordinate - v0.coordinate, at: v0)
+    }
+
+
     @inlinable
     public init<V>(_ ray: KvRay2<V>)
     where V : KvVertex2Protocol, V.Math == Math {
-        self.init(in: ray.direction, at: ray.origin.coordinate)
+        self.init(in: ray.front, at: ray.origin.coordinate)
     }
 
 
@@ -84,6 +94,14 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable
     public init(in direction: Vector, at coordinate: Coordinate) {
         self.init(normal: Vector(x: -direction.y, y: direction.x), at: coordinate)
+    }
+
+
+    /// A line having given direction and containing given coordinate.
+    @inlinable
+    public init<V>(in direction: Vector, at vertex: V)
+    where V : KvVertex2Protocol, V.Math == Math {
+        self.init(normal: Vector(x: -direction.y, y: direction.x), at: vertex.coordinate)
     }
 
 
@@ -98,6 +116,14 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable
     public init(normal: Vector, at coordinate: Coordinate) {
         self.init(normal: normal, c: -Math.dot(coordinate, normal))
+    }
+
+
+    /// A line having given normal and containing given coordinate.
+    @inlinable
+    public init<V>(normal: Vector, at vertex: V)
+    where V : KvVertex2Protocol, V.Math == Math {
+        self.init(normal: normal, c: -Math.dot(vertex.coordinate, normal))
     }
 
 
@@ -143,14 +169,12 @@ public struct KvLine2<Math : KvMathScope> {
     }
 
 
-    /// Alias to ``at``(method).
-    @inlinable
-    public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
+    /// Alias to ``at(_:)`` method.
+    @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 
-    /// - Returns: The distance from the receiver to *c* divided by length of the normal.
-    @inlinable
-    public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
+    /// - Returns: The distance from the receiver to  to given coordinate divided by length of the normal.
+    @inlinable public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
 
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
@@ -159,11 +183,11 @@ public struct KvLine2<Math : KvMathScope> {
     @inlinable public func contains(_ x: Coordinate) -> Bool { KvIsZero(at(x), eps: epsArg(at: x).tolerance) }
 
     /// - Returns: A boolean value indicating whether the receiver contains coordinates of given ray.
-    @inlinable public func contains<V>(_ ray: KvRay2<V>) -> Bool
-    where V : KvVertex2Protocol, V.Math == Math
-    {
+    @inlinable
+    public func contains<V>(_ ray: KvRay2<V>) -> Bool
+    where V : KvVertex2Protocol, V.Math == Math {
         contains(ray.origin.coordinate)
-        && KvIsZero(Math.dot(normal, ray.direction), eps: Math.epsArg(normal).dot(Math.epsArg(ray.direction)).tolerance)
+        && KvIsZero(Math.dot(normal, ray.front), eps: Math.epsArg(normal).dot(Math.epsArg(ray.front)).tolerance)
     }
 
 
@@ -207,7 +231,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func intersection(with line: Self) -> Coordinate? {
         let denominator = normal.x * line.normal.y - normal.y * line.normal.x
 
-        guard KvIsNonzero(denominator) else { return nil }
+        guard KvIsNonzero(denominator, eps: Math.epsArg(normal).cross(Math.epsArg(line.normal)).tolerance) else { return nil }
 
         return Coordinate(x: line.c * normal.y - c * line.normal.y, y: c * line.normal.x - line.c * normal.x) / denominator
     }
@@ -261,7 +285,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         c -= Math.dot(normal, offset)
@@ -270,7 +294,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// - Returns: A line produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(normal: normal, c: c - Math.dot(normal, offset))
@@ -279,7 +303,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         c *= scale
@@ -288,7 +312,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// - Returns: A line produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(normal: normal, c: c * scale)
@@ -297,7 +321,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// Rotates all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func rotate(by angle: Scalar) {
         normal = AffineTransform(angle: angle).act(normal: normal)
@@ -306,7 +330,7 @@ public struct KvLine2<Math : KvMathScope> {
 
     /// - Returns: A line produced applying rotation to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func rotated(by angle: Scalar) -> Self {
         Self(normal: AffineTransform(angle: angle).act(normal: normal), c: c)

@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -373,12 +373,19 @@ where Math : KvMathScope, Vertex : KvVertex3Protocol, Vertex.Math == Math
 
         /// - Returns: A transformed deep copy of the receiver.
         @inlinable
+        public static func *(lhs: KvAffineTransform3<Math>, rhs: Self) -> Self {
+            KvTransform3<Math>(lhs) * rhs
+        }
+
+
+        /// - Returns: A transformed deep copy of the receiver.
+        @inlinable
         public static func *(lhs: KvTransform3<Math>, rhs: Self) -> Self {
             let (t, scale) = Transform.from(lhs)
 
             let (ccw, cw): ([Polygon2], [Polygon2]) = scale.map { scale in
 
-                func Scaled(_ polygons: [Polygon2], by scale: KvTransform3<Math>) -> [Polygon2] {
+                func Scaled(_ polygons: [Polygon2], by scale: KvAffineTransform3<Math>) -> [Polygon2] {
                     polygons.map { scale * $0 }
                 }
 
@@ -722,6 +729,15 @@ where Math : KvMathScope, Vertex : KvVertex3Protocol, Vertex.Math == Math
 
 
     // MARK: Operators
+
+    /// - Returns: A copy of the receiver's subtree where all the nodes are transformed.
+    @inlinable
+    public static func *(lhs: KvAffineTransform3<Math>, rhs: Node) -> Node {
+        Node(polygons: lhs * rhs._polygons,
+             front: rhs._front.map { lhs * $0 },
+             back: rhs._back.map { lhs * $0 })
+    }
+
 
     /// - Returns: A copy of the receiver's subtree where all the nodes are transformed.
     @inlinable

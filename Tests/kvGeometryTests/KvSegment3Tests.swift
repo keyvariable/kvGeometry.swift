@@ -15,10 +15,10 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  KvRay3Tests.swift
+//  KvSegment3Tests.swift
 //  kvGeometry
 //
-//  Created by Svyatoslav Popov on 28.09.2022.
+//  Created by Svyatoslav Popov on 28.10.2022.
 //
 
 import XCTest
@@ -30,10 +30,10 @@ import kvTestKit
 
 
 
-class KvRay3Tests : XCTestCase {
+class KvSegment3Tests : XCTestCase {
 
-    typealias Vertex<Math : KvMathScope> = KvPosition3<Math, Void>
-    typealias Ray<Math : KvMathScope> = KvRay3<Vertex<Math>>
+    typealias V<Math : KvMathScope> = KvPosition3<Math, Void>
+    typealias S<Math : KvMathScope> = KvSegment3<V<Math>>
 
 
 
@@ -50,21 +50,17 @@ class KvRay3Tests : XCTestCase {
 
 
 
-    // MARK: Offset to Plane Test
+    // MARK: Degenerate Test
 
-    func testOffsetToPlane() {
+    func testDegenerate() {
 
         func Run<Math : KvMathScope>(_ math: Math.Type) {
-            let ray = Ray<Math>(in: .one, at: [ 1, 0, 0 ])
+            let v: V<Math> = [ 1, 2, 3 ]
+            let s = S<Math>(v, v)
 
-            func Assert(_ ray: Ray<Math>, _ plane: KvPlane3<Math>, _ expected: Math.Scalar?) {
-                KvAssertEqual(ray.step(to: plane), expected, by: KvIs(_:equalTo:))
-            }
-
-            Assert(ray, .init(normal: .unitX, d: 0), nil)
-            Assert(ray, .init(normal: .unitZ, d: 0), 0)
-            Assert(ray, .init(normal: .unitX, d: -2), 1)
-            Assert(.init(in: .unitX, at: .zero), .init(normal: .unitZ, d: 0), nil)
+            XCTAssert(s.contains(v))
+            XCTAssert(!s.contains(.zero))
+            XCTAssert(!s.contains(.one))
         }
 
         Run(KvMathFloatScope.self)

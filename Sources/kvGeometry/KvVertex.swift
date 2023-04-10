@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -89,6 +89,9 @@ public protocol KvVertexProtocol {
 
 extension KvVertexProtocol {
 
+    /// - Returns: Copy of the receiver having opposite orientation.
+    ///
+    /// Usually the normal or tangent space have to be inverted.
     @inlinable
     public func flipped() -> Self {
         var v = clone()
@@ -97,6 +100,7 @@ extension KvVertexProtocol {
     }
 
 
+    /// - Returns: Linear interpolation of the receiver and other vertex.
     @inlinable
     public func mixed(_ rhs: Self, t: Math.Scalar) -> Self {
         var v = clone()

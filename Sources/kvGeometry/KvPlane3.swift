@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -76,10 +76,28 @@ public struct KvPlane3<Math : KvMathScope> {
     }
 
 
+    // A plane containing *v0*, *v1*, and *v2* vertices.
+    ///
+    /// - Note: Resulting plane is degenerate when *c0*, *c1* and *c2* are on the same plane.
+    @inlinable
+    public init<V0, V1, V2>(_ v0: V0, _ v1: V1, _ v2: V2)
+    where V0 : KvVertex3Protocol, V0.Math == Math, V1 : KvVertex3Protocol, V1.Math == Math, V2 : KvVertex3Protocol, V2.Math == Math {
+        self.init(normal: Math.cross(v1.coordinate - v0.coordinate, v2.coordinate - v0.coordinate), at: v0)
+    }
+
+
     /// A plane having given normal and containing given coordinate.
     @inlinable
     public init(normal: Vector, at coordinate: Coordinate) {
         self.init(normal: normal, d: -Math.dot(coordinate, normal))
+    }
+
+
+    /// A plane having given normal and containing given vertex.
+    @inlinable
+    public init<V>(normal: Vector, at vertex: V)
+    where V : KvVertex3Protocol, V.Math == Math {
+        self.init(normal: normal, d: -Math.dot(vertex.coordinate, normal))
     }
 
 
@@ -147,14 +165,12 @@ public struct KvPlane3<Math : KvMathScope> {
     @inlinable public func epsArg(at x: Coordinate) -> Math.EpsArg { Math.epsArg(normal).dot(Math.epsArg(x)) + Math.EpsArg(d) }
 
 
-    /// Alias to ``at``(method).
-    @inlinable
-    public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
+    /// Alias to ``at(_:)`` method.
+    @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 
     /// - Returns: The distance from the receiver to *x* divided by length of the normal.
-    @inlinable
-    public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
+    @inlinable public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
 
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
@@ -166,8 +182,8 @@ public struct KvPlane3<Math : KvMathScope> {
     where V : KvVertex3Protocol, V.Math == Math
     {
         contains(ray.origin.coordinate)
-        && KvIsZero(Math.dot(normal, ray.direction),
-                    eps: Math.epsArg(normal).dot(Math.epsArg(ray.direction)).tolerance)
+        && KvIsZero(Math.dot(normal, ray.front),
+                    eps: Math.epsArg(normal).dot(Math.epsArg(ray.front)).tolerance)
     }
 
     /// - Returns: A boolean value indicating whether the receiver contains given line.
@@ -220,21 +236,21 @@ public struct KvPlane3<Math : KvMathScope> {
         let (n1, d1) = (normal, d)
         let (n2, d2) = (plane.normal, plane.d)
 
-        let front = Math.cross(n1, n2)
-        guard Math.isNonzero(front) else { return nil }
-
-        let common: Coordinate = {
+        let common: Coordinate
+        do {
             let n11 = Math.length²(n1), n22 = Math.length²(n2)
             let n12 = Math.dot(n1, n2)
 
-            let invD = 1 / (n11 * n22 - n12 * n12)
-            let c1 = (d2 * n12 - d1 * n22) * invD
-            let c2 = (d1 * n12 - d2 * n11) * invD
+            let d = (n11 * n22 - n12 * n12)
+            guard KvIsNonzero(d) else { return nil}
 
-            return c1 * n1 + c2 * n2
-        }()
+            let c1 = d2 * n12 - d1 * n22
+            let c2 = d1 * n12 - d2 * n11
 
-        return KvLine3<Math>(in: front, at: common)
+            common = (c1 * n1 + c2 * n2) / d
+        }
+
+        return KvLine3<Math>(in: Math.cross(n1, n2), at: common)
     }
 
 
@@ -274,6 +290,14 @@ public struct KvPlane3<Math : KvMathScope> {
         normalize()
     }
 
+    /// - Returns: A plane matching the receiver but having unit normal.
+    @inlinable
+    public mutating func safeNormalize(eps: Math.Eps) {
+        guard Math.isNonzero(normal, eps: eps) else { return }
+
+        normalize()
+    }
+
 
     /// - Returns: A plane matching the receiver but having unit normal when the receiver's normal isn't a zero vector.
     @inlinable
@@ -283,10 +307,18 @@ public struct KvPlane3<Math : KvMathScope> {
         return normalized()
     }
 
+    /// - Returns: A plane matching the receiver but having unit normal when the receiver's normal isn't a zero vector.
+    @inlinable
+    public func safeNormalized(eps: Math.Eps) -> Self? {
+        guard Math.isNonzero(normal, eps: eps) else { return nil }
+
+        return normalized()
+    }
+
 
     /// Translates all the receiver's ponts by *offset*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Vector) {
         d -= Math.dot(normal, offset)
@@ -295,7 +327,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// - Returns: A plane produced applying translation by *offset* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Vector) -> Self {
         Self(normal: normal, d: d - Math.dot(normal, offset))
@@ -304,7 +336,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// Translates all the receiver's ponts by *offset* · *normal*.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func translate(by offset: Scalar) {
         d -= offset
@@ -313,7 +345,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// - Returns: A plane produced applying translation by *offset* · *normal* to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func translated(by offset: Scalar) -> Self {
         Self(normal: normal, d: d - offset)
@@ -322,7 +354,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// Scales all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public mutating func scale(by scale: Scalar) {
         d *= scale
@@ -331,7 +363,7 @@ public struct KvPlane3<Math : KvMathScope> {
 
     /// - Returns: A plane produced applying scale to all the receiver's ponts.
     ///
-    /// - Note: It's faster then apply arbitraty transformation.
+    /// - Note: It's faster then apply an arbitrary transformation.
     @inlinable
     public func scaled(by scale: Scalar) -> Self {
         Self(normal: normal, d: d * scale)

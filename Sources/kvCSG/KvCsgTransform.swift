@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -104,15 +104,21 @@ public struct KvCsgTransform<Math : KvMathScope> {
 
     /// - Returns: Transformation and extracted non-uniform scale transformation component if available.
     @inlinable
-    public static func from(_ transform: Underlying) -> (transform: Self, scale: Underlying?) {
+    public static func from(_ transform: Underlying) -> (transform: Self, scale: KvAffineTransform3<Math>?) {
         let scale = Math.abs(transform.scale)
 
         guard !Math.isCollinear(scale, .one)
         else { return (Self(transform), nil) }
 
-        let scaleTransform = Underlying(scale: scale)
+        let scaleTransform = KvAffineTransform3<Math>(scale: scale)
 
         return (Self(transform * scaleTransform.inverse), scaleTransform)
+    }
+
+    /// - Returns: Transformation and extracted non-uniform scale transformation component if available.
+    @inlinable
+    public static func from(_ transform: KvAffineTransform3<Math>) -> (transform: Self, scale: KvAffineTransform3<Math>?) {
+        from(Underlying(transform))
     }
 
 

@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -119,14 +119,13 @@ extension KvCsgPolygonal where Vertex == KvPosition3<Math, Void> {
 // MARK: .KvCsgSCNGeometryVertex
 
 internal struct KvCsgSCNGeometryVertex<Math> : KvSCNGeometrySourcePosition3, KvSCNGeometrySourceNormal3, KvSCNGeometrySourceTx0uv
-where Math : KvMathScope
-{
+where Math : KvMathScope {
 
     let underlying: KvVertex3<Math, Void>
 
-    var position: SCNVector3 { SCNVector3(simd_double3(underlying.coordinate)) }
-    var normal: SCNVector3 { SCNVector3(simd_double3(Math.normalize(underlying.normal))) }
-    var tx0: CGPoint { CGPoint(x: CGFloat(underlying.tx0.x), y: CGFloat(underlying.tx0.y)) }
+    var simdPosition: simd_float3 { simd_float3(underlying.coordinate) }
+    var simdNormal: simd_float3 { simd_float3(Math.normalize(underlying.normal)) }
+    var simdTx0: simd_float2 { simd_float2(underlying.tx0) }
 
 }
 
@@ -135,12 +134,11 @@ where Math : KvMathScope
 // MARK: .KvCsgSCNGeometryPosition
 
 internal struct KvCsgSCNGeometryPosition<Math> : KvSCNGeometrySourcePosition3
-where Math : KvMathScope
-{
+where Math : KvMathScope {
 
     let underlying: KvPosition3<Math, Void>
 
-    var position: SCNVector3 { SCNVector3(simd_double3(underlying.coordinate)) }
+    var simdPosition: simd_float3 { simd_float3(underlying.coordinate) }
 
 }
 
@@ -149,14 +147,13 @@ where Math : KvMathScope
 // MARK: .KvCsgSCNGeometryPositionNormal
 
 internal struct KvCsgSCNGeometryPositionNormal<Math> : KvSCNGeometrySourcePosition3, KvSCNGeometrySourceNormal3
-where Math : KvMathScope
-{
+where Math : KvMathScope {
 
     let underlying: KvPosition3<Math, Void>
     let faceNormal: Math.Vector3
 
-    var position: SCNVector3 { SCNVector3(simd_double3(underlying.coordinate)) }
-    var normal: SCNVector3 { SCNVector3(simd_double3(Math.normalize(faceNormal))) }
+    var simdPosition: simd_float3 { simd_float3(underlying.coordinate) }
+    var simdNormal: simd_float3 { simd_float3(Math.normalize(faceNormal)) }
 
 }
 

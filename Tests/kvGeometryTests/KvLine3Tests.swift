@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -48,28 +48,6 @@ class KvLine3Tests : XCTestCase {
 
 
 
-    // MARK: Init with Direction and Coordinate Tests
-
-    func testInitWithDirectionAndCoordinate() {
-
-        func Run<Math : KvMathScope>(_ math: Math.Type) {
-            /// Quaternion when line contains the origin.
-            let q1 = Math.Quaternion(from: L<Math>.front, to: Math.normalize(.one))
-
-            assertEqual(L<Math>(in: .one, at: .zero), .init(quaternion: q1, d: 0))
-            assertEqual(L<Math>(in: .one, at: .one), .init(quaternion: q1, d: 0))
-
-            assertEqual(L<Math>(in: .one, at: .unitX), .init(in: .one, at: [ 2, 1, 1 ]))
-
-            assertEqual(L<Math>(in: [ 0, (0.5 as Math.Scalar).squareRoot(), 0 ], at: .zero), .init(quaternion: .init(angle: 0.5 * .pi, axis: .unitX), d: 0))
-        }
-
-        Run(KvMathFloatScope.self)
-        Run(KvMathDoubleScope.self)
-    }
-
-
-
     // MARK: .contains Coordiante Tests
 
     func testContainsCoordinate() {
@@ -85,11 +63,11 @@ class KvLine3Tests : XCTestCase {
                 while t <= 100 {
                     defer { t += 25 }
 
-                    let c_in = line.closestToOrigin + t * line.front
-                    XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_in)")
+                    let c_in = line.origin + t * line.front
+                    XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_in)")
 
-                    let c_out = c_in + 1e-3 * line.up
-                    XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_out)")
+                    let c_out = c_in + 1e-3 * Math.Quaternion(from: .unitZ, to: line.front).act(.unitY)
+                    XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_out)")
                 }
             }
         }
