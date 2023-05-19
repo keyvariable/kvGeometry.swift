@@ -157,7 +157,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func y(x: Scalar) -> Scalar? {
         guard KvIsNonzero(normal.y) else { return nil }
 
-        return -(c + normal.x * x) / normal.y
+        return -(c + normal.x * x) as Scalar / normal.y
     }
 
     /// - Returns: X coodinate where horizontal line at *y* intersects the receiver.
@@ -165,7 +165,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func x(y: Scalar) -> Scalar? {
         guard KvIsNonzero(normal.x) else { return nil }
 
-        return -(c + normal.y * y) / normal.x
+        return -(c + normal.y * y) as Scalar / normal.x
     }
 
 
@@ -223,17 +223,17 @@ public struct KvLine2<Math : KvMathScope> {
 
 
     /// - Returns: A boolean value indicating whether the receiver and *rhs* intersect.
-    @inlinable public func intersects(with rhs: Self) -> Bool { KvIsNonzero(normal.x * rhs.normal.y - normal.y * rhs.normal.x) }
+    @inlinable public func intersects(with rhs: Self) -> Bool { KvIsNonzero((normal.x * rhs.normal.y) as Scalar - (normal.y * rhs.normal.x) as Scalar) }
 
 
     /// - Returns: Single common coordinate of the receiver and given line. If the lines are parallel or equal then *nil* is returned.
     @inlinable
     public func intersection(with line: Self) -> Coordinate? {
-        let denominator = normal.x * line.normal.y - normal.y * line.normal.x
+        let denominator: Scalar = (normal.x * line.normal.y) as Scalar - (normal.y * line.normal.x) as Scalar
 
         guard KvIsNonzero(denominator, eps: Math.epsArg(normal).cross(Math.epsArg(line.normal)).tolerance) else { return nil }
 
-        return Coordinate(x: line.c * normal.y - c * line.normal.y, y: c * line.normal.x - line.c * normal.x) / denominator
+        return Coordinate(x: (line.c * normal.y) as Scalar - (c * line.normal.y) as Scalar, y: (c * line.normal.x) as Scalar - (line.c * normal.x) as Scalar) / denominator
     }
 
 

@@ -103,7 +103,7 @@ where Math : KvMathScope, Vertex : KvVertex3Protocol, Vertex.Math == Math
 
         /// - Returns: Coordinate where
         func TxBase(_ quad: TextureLayout.Quad, in direction: Math.Vector2) -> Math.Vector2 {
-            quad.convert(normalized: direction * 0.5 + 0.5)
+            quad.convert(normalized: (direction * 0.5) as Math.Vector2 + 0.5 as Math.Vector2)
         }
 
 
