@@ -19,6 +19,18 @@
 
 import PackageDescription
 
+let targets: [Target] = [
+    .target(
+        name: "kvGeometry",
+        dependencies: [ .product(name: "kvKit", package: "kvKit-Swift") ]
+    ),
+    .target(
+        name: "kvCSG",
+        dependencies: [ "kvGeometry" ]
+    ),
+    .testTarget(name: "kvGeometryTests", dependencies: [ "kvGeometry", .product(name: "kvTestKit", package: "kvKit-Swift") ]),
+]
+
 let package = Package(
     name: "kvGeometry.swift",
 
@@ -34,15 +46,5 @@ let package = Package(
         .package(url: "https://github.com/keyvariable/kvKit-Swift.git", from: "3.1.0"),
     ],
 
-    targets: [
-        .target(
-            name: "kvGeometry",
-            dependencies: [ .product(name: "kvKit", package: "kvKit-Swift") ]
-        ),
-        .target(
-            name: "kvCSG",
-            dependencies: [ "kvGeometry" ]
-        ),
-        .testTarget(name: "kvGeometryTests", dependencies: [ "kvGeometry", .product(name: "kvTestKit", package: "kvKit-Swift") ]),
-    ]
+    targets: targets
 )

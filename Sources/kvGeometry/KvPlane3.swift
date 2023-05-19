@@ -241,13 +241,13 @@ public struct KvPlane3<Math : KvMathScope> {
             let n11 = Math.length²(n1), n22 = Math.length²(n2)
             let n12 = Math.dot(n1, n2)
 
-            let d = (n11 * n22 - n12 * n12)
+            let d: Scalar = (n11 * n22) as Scalar - (n12 * n12) as Scalar
             guard KvIsNonzero(d) else { return nil}
 
-            let c1 = d2 * n12 - d1 * n22
-            let c2 = d1 * n12 - d2 * n11
+            let c1: Scalar = (d2 * n12) as Scalar - (d1 * n22) as Scalar
+            let c2: Scalar = (d1 * n12) as Scalar - (d2 * n11) as Scalar
 
-            common = (c1 * n1 + c2 * n2) / d
+            common = ((c1 * n1) as Coordinate + (c2 * n2) as Coordinate) / d
         }
 
         return KvLine3<Math>(in: Math.cross(n1, n2), at: common)

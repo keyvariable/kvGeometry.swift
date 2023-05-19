@@ -106,15 +106,15 @@ public struct KvOriginRay2<Math : KvMathScope> {
     @inlinable
     public func step<V>(to ray: KvRay2<V>) -> Scalar?
     where V : KvVertex2Protocol, V.Math == Math {
-        let denominator = front.y * ray.front.x - front.x * ray.front.y
+        let denominator = (front.y * ray.front.x) as Scalar - (front.x * ray.front.y) as Scalar
 
         guard KvIsNonzero(denominator) else { return nil }
 
         let recip_d = 1 / denominator
         let dOrigin = ray.origin.coordinate
 
-        let t = (dOrigin.y * ray.front.x - dOrigin.x * ray.front.y) * recip_d
-        let tr = (dOrigin.y * front.x - dOrigin.x * front.y) * recip_d
+        let t: Scalar = ((dOrigin.y * ray.front.x) as Scalar - (dOrigin.x * ray.front.y) as Scalar) * recip_d
+        let tr: Scalar = ((dOrigin.y * front.x) as Scalar - (dOrigin.x * front.y) as Scalar) * recip_d
 
         guard KvIsNotNegative(t), KvIsNotNegative(tr) else { return nil }
 

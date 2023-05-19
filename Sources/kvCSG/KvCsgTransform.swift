@@ -137,7 +137,7 @@ public struct KvCsgTransform<Math : KvMathScope> {
 
         guard Math.isNonzero(front) else { return nil }
 
-        return KvLine2<Math>(in: front, at: (-plane.d / Math.length²(n)) * n)
+        return KvLine2<Math>(in: front, at: ((-plane.d / Math.length²(n)) * n) as Math.Vector2)
     }
 
 

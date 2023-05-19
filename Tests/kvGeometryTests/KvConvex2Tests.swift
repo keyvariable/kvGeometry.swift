@@ -277,10 +277,10 @@ class KvConvex2Tests : XCTestCase {
 
         func MakeTestCase<Math : KvMathScope>(_ math: Math.Type, isCCW: Bool, count: Int) throws -> TestCase<Math> {
             let start, end: Double
-            (start, end) = isCCW ? (0, 2 * .pi) : (2 * .pi, 0)
+            (start, end) = isCCW ? (0.0, 2.0 * Double.pi) : (2.0 * Double.pi, 0.0)
             let eps: Double = sign(end - start) * 1e-3
 
-            let input = stride(from: start, to: end - eps, by: (end - start) / Double(count))
+            let input = stride(from: start, to: (end - eps) as Double, by: (end - start) / Double.Stride(count))
                 .map { Vertex<Math>(x: Math.Scalar(cos($0)), y: Math.Scalar(sin($0))) }
 
             let output = Self.verticesAndSteps(from: input)
@@ -363,13 +363,15 @@ class KvConvex2Tests : XCTestCase {
         func MakeTestCase<Math : KvMathScope>(_ math: Math.Type, isCCW: Bool, backIndex: Int) -> TestCase<Math> {
             typealias TC = TestCase<Math>
 
+            typealias Scalar = Math.Scalar
+
             var input = Self.quadVertices(Math.self, isCCW: isCCW)
 
             // Insertion of backward case preserving the direction.
             do {
                 let prevIndex = (backIndex > 0 ? backIndex : input.endIndex) - 1
                 let v = input[backIndex]
-                let offset = 0.1 * (v.coordinate - input[prevIndex].coordinate)
+                let offset = 0.1 as Scalar * (v.coordinate - input[prevIndex].coordinate) as Math.Vector2
 
                 input[backIndex] -= offset
                 input.insert(v, at: backIndex)
@@ -452,10 +454,12 @@ class KvConvex2Tests : XCTestCase {
     func testForwardVertices() {
 
         func MakeTestCase<Math : KvMathScope>(_ math: Math.Type, isCCW: Bool, count: Int) -> TestCase<Math> {
+            typealias Scalar = Math.Scalar
+
             let quad = Self.quadVertices(Math.self, isCCW: isCCW)
 
-            let step: Double = 1.0 / Double(1 + count)
-            let offsets = stride(from: 0.0, to: 1.0 - 1e-4, by: step)
+            let step: Scalar = 1.0 as Scalar / Scalar(1 + count)
+            let offsets = stride(from: 0.0 as Scalar, to: (1.0 as Scalar - 1e-4 as Scalar) as Scalar, by: (0.0 as Scalar).distance(to: step))
                 .lazy.map { Math.Scalar($0) }
 
             let input = zip(quad, KvCollectionKit.cyclicShiftedLeft(quad))

@@ -135,7 +135,7 @@ public struct KvAffineTransform2<Math : KvMathScope> {
     /// - Note: This method is to be applied to normal matrices to compensate for the effect on length of normals.
     @inlinable
     public static func normalizedScaleComponent(for m: NormalMatrix) -> NormalMatrix {
-        m * Math.rsqrt(0.5 * (Math.length²(m[0]) + Math.length²(m[1])))
+        m * Math.rsqrt(0.5 as Scalar * (Math.length²(m[0]) + Math.length²(m[1])))
     }
 
     /// - Returns: A normalized scale vector.

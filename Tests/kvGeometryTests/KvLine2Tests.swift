@@ -51,7 +51,7 @@ class KvLine2Tests : XCTestCase {
 
         func Run<Math : KvMathScope>(_ math: Math.Type) {
             let c = -(0.5 as Math.Scalar).squareRoot()
-            let line = makeLine(math, angle: 0.25 * .pi, c: c)
+            let line = makeLine(math, angle: (0.25 as Math.Scalar) * Math.Scalar.pi, c: c)
 
             func Assert(_ result: Math.Vector2?, _ expected: Math.Vector2?) {
                 KvAssertEqual(result, expected, by: Math.isEqual(_:_:))
@@ -76,7 +76,7 @@ class KvLine2Tests : XCTestCase {
     // MARK: Auxiliaries
 
     private func makeLine<Math : KvMathScope>(_ math: Math.Type, angle: Math.Scalar, c: Math.Scalar) -> KvLine2<Math> {
-        let (sine, cosine) = Math.sincos(angle + 0.5 * .pi)
+        let (sine, cosine) = Math.sincos(angle + (0.5 as Math.Scalar) * Math.Scalar.pi)
         return .init(normal: .init(x: cosine, y: sine), c: c)
     }
 

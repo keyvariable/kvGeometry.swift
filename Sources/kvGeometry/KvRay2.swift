@@ -141,15 +141,15 @@ public struct KvRay2<Vertex : KvVertex2Protocol> {
     @inlinable
     public func step<V>(to ray: KvRay2<V>) -> Scalar?
     where V : KvVertex2Protocol, V.Math == Vertex.Math {
-        let denominator = front.y * ray.front.x - front.x * ray.front.y
+        let denominator: Scalar = (front.y * ray.front.x) as Scalar - (front.x * ray.front.y) as Scalar
 
         guard KvIsNonzero(denominator, eps: Math.epsArg(front).cross(Math.epsArg(ray.front)).tolerance) else { return nil }
 
-        let recip_d = 1 / denominator
+        let recip_d: Scalar = 1.0 as Scalar / denominator
         let dOrigin = ray.origin.coordinate - origin.coordinate
 
-        let t = (dOrigin.y * ray.front.x - dOrigin.x * ray.front.y) * recip_d
-        let tr = (dOrigin.y * front.x - dOrigin.x * front.y) * recip_d
+        let t: Scalar = ((dOrigin.y * ray.front.x) as Scalar - (dOrigin.x * ray.front.y) as Scalar) * recip_d
+        let tr: Scalar = ((dOrigin.y * front.x) as Scalar - (dOrigin.x * front.y) as Scalar) * recip_d
 
         guard KvIsNotNegative(t), KvIsNotNegative(tr) else { return nil }
 
