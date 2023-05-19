@@ -25,7 +25,7 @@ This package is completely crossplatform.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/keyvariable/kvGeometry.swift.git", from: "0.1.0"),
+    .package(url: "https://github.com/keyvariable/kvGeometry.swift.git", from: "0.1.1"),
 ]
 ```
 
