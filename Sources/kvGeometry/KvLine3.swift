@@ -171,6 +171,8 @@ public struct KvLine3<Math : KvMathScope> {
     @inlinable public func projection(of c: Coordinate) -> Coordinate { at(Math.dot((c - origin), front)) }
 
 
+    // MARK: Transformations
+
     /// - Returns: A line produced applying translation by *offset* to all the receiver's ponts.
     ///
     /// - Note: It's faster then apply an arbitrary transformation.

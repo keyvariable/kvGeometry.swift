@@ -283,6 +283,8 @@ public struct KvLine2<Math : KvMathScope> {
     }
 
 
+    // MARK: Transformations
+
     /// Translates all the receiver's ponts by *offset*.
     ///
     /// - Note: It's faster then apply an arbitrary transformation.
