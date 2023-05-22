@@ -126,14 +126,16 @@ class KvTransformTests : XCTestCase {
 
         // TODO: Complete tests
         func Run<Math : KvMathScope>(_ math: Math.Type) {
+            typealias Scalar = Math.Scalar
+
             RunT2(
                 math,
-                angles: 0, 0.1 * .pi, 0.25 * .pi, 0.5 * .pi, .pi
+                angles: 0.0 as Scalar, 0.1 * Scalar.pi, 0.25 * Scalar.pi, 0.5 * Scalar.pi, Scalar.pi
             )
 
             RunT3(
                 math,
-                quaternions: .zeroAngle, .init(angle: 0.1 * .pi, axis: .unitX), .init(angle: 0.25 * .pi, axis: .unitY), .init(angle: 0.5 * .pi, axis: .unitZ)
+                quaternions: .zeroAngle, .init(angle: 0.1 * Scalar.pi, axis: .unitX), .init(angle: 0.25 * Scalar.pi, axis: .unitY), .init(angle: 0.5 * Scalar.pi, axis: .unitZ)
             )
         }
 
