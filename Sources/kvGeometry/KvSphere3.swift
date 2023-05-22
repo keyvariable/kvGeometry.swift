@@ -33,6 +33,7 @@ public struct KvSphere3<Math : KvMathScope> {
     public typealias Scalar = Math.Scalar
     public typealias Vector = Math.Vector3
     public typealias Coordinate = Vector
+    public typealias Quaternion = Math.Quaternion
 
     public typealias Transform = KvTransform3<Math>
     public typealias AffineTransform = KvAffineTransform3<Math>
@@ -102,7 +103,18 @@ public struct KvSphere3<Math : KvMathScope> {
     @inlinable public var minZ: Coordinate { center - radius * .unitZ }
     
 
-    // TODO: Transformation methods and operators.
+    // MARK: Transformations
+
+    /// - Returns: A sphere produced applying translation by *offset* to all the receiver's ponts.
+    @inlinable public func translated(by offset: Vector) -> Self { .init(at: center + offset, radius: radius) }
+
+
+    /// - Returns: A sphere produced applying scale to all the receiver's ponts.
+    @inlinable public func scaled(by scale: Scalar) -> Self { .init(at: center * scale, radius: radius * scale) }
+
+
+    /// - Returns: A sphere produced applying rotation by given quaterion to all the receiver's ponts.
+    @inlinable public func rotated(by quaternion: Quaternion) -> Self { .init(at: quaternion.act(center), radius: radius) }
 
 }
 
