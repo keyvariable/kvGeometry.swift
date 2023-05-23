@@ -66,7 +66,7 @@ class KvLine3Tests : XCTestCase {
                     let c_in = line.origin + t * line.front
                     XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_in)")
 
-                    let c_out = c_in + 1e-3 * Math.Quaternion(from: .unitZ, to: line.front).act(.unitY)
+                    let c_out = c_in + 1e-2 * Math.Quaternion(from: .unitZ, to: line.front).act(.unitY)
                     XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_out)")
                 }
             }

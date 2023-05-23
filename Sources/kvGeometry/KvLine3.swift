@@ -117,12 +117,16 @@ public struct KvLine3<Math : KvMathScope> {
 
 
     /// - Returns: The distance from the receiver to given coordinate.
+    ///
+    /// See: ``distanceEpsArg(_:)``.
     @inlinable
     public func distance(to x: Coordinate) -> Scalar {
         Math.length(Math.cross(x - origin, front))
     }
 
     /// - Returns: The distance from the receiver to given vertex.
+    ///
+    /// See: ``distanceEpsArg(_:)``.
     @inlinable
     public func distance<V>(to v: V) -> Scalar
     where V : KvVertex3Protocol, V.Math == Math {
@@ -131,17 +135,27 @@ public struct KvLine3<Math : KvMathScope> {
 
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
+    ///
+    /// See: ``distanceEpsArg(_:)``.
     @inlinable
     public func contains(_ c: Coordinate) -> Bool {
-        let c = c - origin
-        return Math.isZero(Math.cross(front, c), eps: Math.epsArg(front).cross(Math.epsArg(c)).tolerance)
+        Math.isZero(Math.cross(front, c - origin), eps: distanceEpsArg(c).tolerance)
     }
 
     /// - Returns: A boolean value indicating whether the receiver contains given coordinate.
+    ///
+    /// See: ``distanceEpsArg(_:)``.
     @inlinable
     public func contains<V>(_ v: V) -> Bool
     where V : KvVertex3Protocol, V.Math == Math {
         contains(v.coordinate)
+    }
+
+
+    /// - Returns: The tolerance argument for the distance calculation.
+    @inlinable
+    public func distanceEpsArg(_ c: Coordinate) -> Math.EpsArg3 {
+        Math.epsArg(front).cross(Math.epsArg(c) - Math.epsArg(origin))
     }
 
 

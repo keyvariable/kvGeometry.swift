@@ -115,6 +115,14 @@ public struct KvPlane3<Math : KvMathScope> {
     @inlinable public var isDegenerate: Bool { Math.isZero(normal) }
 
 
+    /// Length of the receiver's normal.
+    /// E.g. it can be used to convert offsets of non-normalized planes to distances.
+    ///
+    /// - Note: Use it as less as possible.
+    /// - Note: There no need to use it when the receiver is normalized.
+    @inlinable public var scale: Scalar { Math.length(normal) }
+
+
     /// A transformation matrix from z = 0 plane to the receiver.
     ///
     /// - Note: Result is undefined when the receiver is degenerate.
@@ -169,7 +177,7 @@ public struct KvPlane3<Math : KvMathScope> {
     @inlinable public func signedOffset(to x: Coordinate) -> Scalar { at(x) }
 
 
-    /// - Returns: The distance from the receiver to *x* divided by length of the normal.
+    /// - Returns: The distance from the receiver to *x* scaled by length of the receiver's normal.
     @inlinable public func offset(to x: Coordinate) -> Scalar { abs(at(x)) }
 
 
