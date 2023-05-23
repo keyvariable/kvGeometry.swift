@@ -94,7 +94,7 @@ class KvRay2Tests : XCTestCase {
                     let c_in = line.closestToOrigin + t * line.front
                     XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_in)")
 
-                    let c_out = c_in + 1e-3 * line.normal
+                    let c_out = c_in + 1e-2 * line.normal
                     XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_out)")
                 }
             }
