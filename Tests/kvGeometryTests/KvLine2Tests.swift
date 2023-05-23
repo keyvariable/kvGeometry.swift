@@ -73,6 +73,39 @@ class KvLine2Tests : XCTestCase {
 
 
 
+    // MARK: .contains Coordiante Tests
+
+    func testContainsCoordinate() {
+
+        func Run<Math : KvMathScope>(_ math: Math.Type)
+        where Math.Scalar.RawSignificand : FixedWidthInteger
+        {
+            typealias Scalar = Math.Scalar
+
+            (0..<50).forEach { _ in
+                let line = KvLine2<Math>(in: Math.randomNonzero2(in: (-10.0 as Scalar) ... (10.0 as Scalar)),
+                                         at: Math.random2(in: (-100.0 as Scalar) ... (100.0 as Scalar)))
+
+                var t = -100.0 as Scalar
+                while t <= 100.0 as Scalar {
+                    defer { t += 25.0 as Scalar }
+
+                    let c_in = line.closestToOrigin + t * line.front
+                    XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_in)")
+
+                    let offset: Scalar = max(1.0 as Scalar, Math.abs(c_in).max()) * (1e-2 as Scalar)
+                    let c_out = c_in + offset * line.normal
+                    XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_out)")
+                }
+            }
+        }
+
+        Run(KvMathFloatScope.self)
+        Run(KvMathDoubleScope.self)
+    }
+
+
+
     // MARK: Auxiliaries
 
     private func makeLine<Math : KvMathScope>(_ math: Math.Type, angle: Math.Scalar, c: Math.Scalar) -> KvLine2<Math> {
