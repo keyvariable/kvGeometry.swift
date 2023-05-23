@@ -253,6 +253,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Returns: Scale component of given tranform matrix.
     ///
     /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    /// - Warning: Assuming the receiver has no shear component. Consider ``decompose(_:)`` method to extract scale from transformations having non-trivial shear component.
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable
     public static func scale(from m: Matrix) -> Vector {
@@ -422,6 +423,32 @@ public struct KvTransform3<Math : KvMathScope> {
 
 
 
+    // MARK: Decomposition
+
+    /// - Returns: Translation, rotation, shear and scale components of given *matrix*.
+    ///
+    /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    ///
+    /// See: ``decompose()``.
+    @inlinable
+    public static func decompose(_ matrix: Matrix) -> (translation: Vector, rotation: Math.Matrix3x3, shear: (xy: Scalar, xz: Scalar, yz: Scalar), scale: Vector) {
+        let (rotation, shear, scale) = KvAffineTransform3<Math>.decompose(Math.make3(matrix))
+        return (translation(from: matrix), rotation, shear, scale)
+    }
+
+
+    /// - Returns: Translation, rotation, shear and scale components of the receiver.
+    ///
+    /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    ///
+    /// See: ``decompose(_:)``.
+    @inlinable
+    public func decompose() -> (translation: Vector, rotation: Math.Matrix3x3, shear: (xy: Scalar, xz: Scalar, yz: Scalar), scale: Vector) {
+        Self.decompose(matrix)
+    }
+
+
+
     // MARK: Operations
 
     /// Transformed X basis vector.
@@ -452,6 +479,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// Scale component of the receiver.
     ///
     /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    /// - Warning: Assuming the receiver has no shear component. Consider ``decompose()`` method to extract scale from transformations having non-trivial shear component.
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable public var scale: Vector { KvTransform3.scale(from: matrix) }
 
