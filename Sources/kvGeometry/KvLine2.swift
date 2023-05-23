@@ -157,7 +157,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func y(x: Scalar) -> Scalar? {
         guard KvIsNonzero(normal.y) else { return nil }
 
-        return -(c + normal.x * x) as Scalar / normal.y
+        return (-(c + normal.x * x)) as Scalar / normal.y
     }
 
     /// - Returns: X coodinate where horizontal line at *y* intersects the receiver.
@@ -165,7 +165,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func x(y: Scalar) -> Scalar? {
         guard KvIsNonzero(normal.x) else { return nil }
 
-        return -(c + normal.y * y) as Scalar / normal.x
+        return (-(c + normal.y * y)) as Scalar / normal.x
     }
 
 
