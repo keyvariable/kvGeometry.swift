@@ -257,7 +257,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable
     public static func scale(from m: Matrix) -> Vector {
-        Vector(x: Math.length(m[0]) * (KvIsNotNegative(m.determinant) ? 1 : -1),
+        Vector(x: Math.length(m[0]) * (KvIsNotNegative(m.determinant) ? (1.0 as Scalar) : (-1.0 as Scalar)),
                y: Math.length(m[1]),
                z: Math.length(m[2]))
     }
