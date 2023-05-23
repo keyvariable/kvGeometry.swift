@@ -57,10 +57,7 @@ class KvLine3Tests : XCTestCase {
                 let line = KvLine3<Math>(in: Math.randomNonzero3(in: (-10.0 as Scalar) ... (10.0 as Scalar)),
                                          at: Math.random3(in: (-100.0 as Scalar) ... (100.0 as Scalar)))
 
-                var t = -100.0 as Scalar
-                while t <= 100.0 as Scalar {
-                    defer { t += 25.0 as Scalar }
-
+                stride(from: -100.0 as Scalar, through: 100.0 as Scalar, by: (0.0 as Scalar).distance(to: 25.0 as Scalar)).forEach { t in
                     let c_in = line.origin + t * line.front
                     XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_in)")
 

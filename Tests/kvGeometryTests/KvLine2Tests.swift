@@ -86,10 +86,7 @@ class KvLine2Tests : XCTestCase {
                 let line = KvLine2<Math>(in: Math.randomNonzero2(in: (-10.0 as Scalar) ... (10.0 as Scalar)),
                                          at: Math.random2(in: (-100.0 as Scalar) ... (100.0 as Scalar)))
 
-                var t = -100.0 as Scalar
-                while t <= 100.0 as Scalar {
-                    defer { t += 25.0 as Scalar }
-
+                stride(from: -100.0 as Scalar, through: 100.0 as Scalar, by: (0.0 as Scalar).distance(to: 25.0 as Scalar)).forEach { t in
                     let c_in = line.closestToOrigin + t * line.front
                     XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_in)")
 
