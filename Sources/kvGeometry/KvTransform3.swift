@@ -191,8 +191,8 @@ public struct KvTransform3<Math : KvMathScope> {
         var r = NormalMatrix(quaternion)
         var r⁻¹ = r.transpose
 
-        let scale⁻¹ = (1.0 as Scalar) / scale
-        let t⁻¹ = (r⁻¹ * -translation) * scale⁻¹
+        let scale⁻¹: Vector = (1.0 as Scalar) / scale
+        let t⁻¹: Vector = ((r⁻¹ * (-translation as Vector)) as Vector) * scale⁻¹
 
         r[0] *= scale.x
         r[1] *= scale.y

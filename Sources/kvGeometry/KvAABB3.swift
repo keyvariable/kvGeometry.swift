@@ -294,7 +294,7 @@ public struct KvAABB3<Math : KvMathScope> {
     /// - Returns: An AABB produced applying scale to the receiver.
     ///
     /// - Note: It's faster then apply an arbitrary transformation.
-    @inlinable public func scaled(by scale: Vector) -> Self { Self(over: min * scale, max * scale) }
+    @inlinable public func scaled(by scale: Vector) -> Self { Self(over: (min * scale) as Vector, (max * scale) as Vector) }
 
 
     /// Changes the receiver to enclose box produced as result of transformation of the receiver.
