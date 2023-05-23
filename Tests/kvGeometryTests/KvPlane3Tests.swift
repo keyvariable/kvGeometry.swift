@@ -85,29 +85,39 @@ class KvPlane3Tests : XCTestCase {
         func Run<Math : KvMathScope>(_ math: Math.Type)
         where Math.Scalar.RawSignificand : FixedWidthInteger
         {
+            typealias Scalar = Math.Scalar
             typealias P = KvPlane3<Math>
 
-            (0..<10).forEach { _ in
-                let plane = P(normal: Math.randomNonzero3(in: -10...10),
-                              at: Math.random3(in: -100...100))
+            let angleRange = (0.0 as Scalar) ..< ((2.0 as Scalar) * Scalar.pi)
+            let translationRange = (-100.0 as Scalar) ... (100.0 as Scalar)
 
-                let m = plane.worldMatrix
+            (0..<25).forEach { _ in
+                let matrix = P.Transform.makeMatrix(
+                    translation: Math.random3(in: translationRange),
+                    quaternion: .init(angle: .random(in: angleRange), axis: Math.Vector3.unitRandom())
+                )
+
+                let plane = { P(normal: $0.z, at: $0.origin) }(P.Transform.Basis(matrix))
                 let unitNormal = Math.normalize(plane.normal)
 
-                var tx: Math.Scalar = -100
-                while tx <= 100 {
-                    defer { tx += 25 }
 
-                    var ty: Math.Scalar = -100
-                    while ty <= 100 {
-                        defer { ty += 25 }
+                func Assert(_ tx: Scalar, _ ty: Scalar) {
+                    let c_in = P.Transform.act(matrix, coordinate: .init(x: tx, y: ty, z: 0.0 as Scalar))
+                    XCTAssert(plane.contains(c_in), "contains: plane = (\(plane)), c = \(c_in), t = (\(tx), \(ty)), distance = \(plane.offset(to: c_in))")
 
-                        let c_in = P.Transform.act(m, coordinate: .init(x: tx, y: ty, z: 0))
-                        XCTAssert(plane.contains(c_in), "contains: plane = (\(plane)), c = \(c_in)")
+                    let offset: Scalar = max(1.0 as Scalar, Math.abs(c_in).max()) * (1e-3 as Scalar)
+                    let c_out = c_in + offset * unitNormal
+                    XCTAssert(!plane.contains(c_out), "!contains: plane = (\(plane)), c = \(c_out), t = (\(tx), \(ty)), distance = \(plane.offset(to: c_in))")
+                }
 
-                        let c_out = c_in + 1e-3 * unitNormal
-                        XCTAssert(!plane.contains(c_out), "!contains: plane = (\(plane)), c = \(c_out)")
-                    }
+
+                stride(from: -50.0 as Scalar, through: 50.001 as Scalar, by: (0.0 as Scalar).distance(to: 10.0 as Scalar)).forEach { t in
+                    Assert(t, 0.0 as Scalar)
+                    Assert(0.0 as Scalar, t)
+                }
+
+                stride(from: -50.0 as Scalar, through: 50.001 as Scalar, by: (0.0 as Scalar).distance(to: 10.0 as Scalar)).forEach { t in
+                    Assert(t, t)
                 }
             }
         }

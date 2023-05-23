@@ -44,7 +44,7 @@ let package = Package(
     ],
 
     dependencies: [
-        .package(url: "https://github.com/keyvariable/kvKit-Swift.git", from: "3.3.0-a.4"),
+        .package(url: "https://github.com/keyvariable/kvKit-Swift.git", from: "3.3.0-a.5"),
     ],
 
     targets: targets
