@@ -31,10 +31,6 @@ import kvKit
 
 class KvLine3Tests : XCTestCase {
 
-    typealias L<Math : KvMathScope> = KvLine3<Math>
-
-
-
     // MARK: : XCTestCase
 
     override func setUpWithError() throws {
@@ -55,18 +51,18 @@ class KvLine3Tests : XCTestCase {
         func Run<Math : KvMathScope>(_ math: Math.Type)
         where Math.Scalar.RawSignificand : FixedWidthInteger
         {
+            typealias Scalar = Math.Scalar
+
             (0..<50).forEach { _ in
-                let line = L<Math>(in: Math.randomNonzero3(in: -10...10),
-                                   at: Math.random3(in: -100...100))
+                let line = KvLine3<Math>(in: Math.randomNonzero3(in: (-10.0 as Scalar) ... (10.0 as Scalar)),
+                                         at: Math.random3(in: (-100.0 as Scalar) ... (100.0 as Scalar)))
 
-                var t: Math.Scalar = -100
-                while t <= 100 {
-                    defer { t += 25 }
-
+                stride(from: -100.0 as Scalar, through: 100.0 as Scalar, by: (0.0 as Scalar).distance(to: 25.0 as Scalar)).forEach { t in
                     let c_in = line.origin + t * line.front
                     XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_in)")
 
-                    let c_out = c_in + 1e-3 * Math.Quaternion(from: .unitZ, to: line.front).act(.unitY)
+                    let offset: Scalar = max(1.0 as Scalar, Math.abs(c_in).max()) * (1e-3 as Scalar)
+                    let c_out = c_in + offset * Math.Quaternion(from: .unitZ, to: line.front).act(.unitY)
                     XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.origin)), c = \(c_out)")
                 }
             }
@@ -80,7 +76,7 @@ class KvLine3Tests : XCTestCase {
 
     // MARK: Auxiliaries
 
-    func assertEqual<Math>(_ line: L<Math>, _ expected: L<Math>) {
+    func assertEqual<Math>(_ line: KvLine3<Math>, _ expected: KvLine3<Math>) {
         XCTAssert(line.isEqual(to: expected), "Resulting \(line) line is not equal to expected \(expected) line")
     }
 

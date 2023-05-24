@@ -126,14 +126,16 @@ class KvTransformTests : XCTestCase {
 
         // TODO: Complete tests
         func Run<Math : KvMathScope>(_ math: Math.Type) {
+            typealias Scalar = Math.Scalar
+
             RunT2(
                 math,
-                angles: 0, 0.1 * .pi, 0.25 * .pi, 0.5 * .pi, .pi
+                angles: 0.0 as Scalar, 0.1 * Scalar.pi, 0.25 * Scalar.pi, 0.5 * Scalar.pi, Scalar.pi
             )
 
             RunT3(
                 math,
-                quaternions: .zeroAngle, .init(angle: 0.1 * .pi, axis: .unitX), .init(angle: 0.25 * .pi, axis: .unitY), .init(angle: 0.5 * .pi, axis: .unitZ)
+                quaternions: .zeroAngle, .init(angle: 0.1 * Scalar.pi, axis: .unitX), .init(angle: 0.25 * Scalar.pi, axis: .unitY), .init(angle: 0.5 * Scalar.pi, axis: .unitZ)
             )
         }
 
@@ -214,16 +216,18 @@ class KvTransformTests : XCTestCase {
 
         // TODO: Complete tests
         func Run<Math : KvMathScope>(_ math: Math.Type) {
+            typealias Scalar = Math.Scalar
+
             RunT2(
                 math,
-                angles: 0, 0.1 * .pi, 0.25 * .pi, 0.5 * .pi, .pi,
-                scales: .one, [ 2, -2 ]
+                angles: 0,0 as Scalar, (0.1 as Scalar) * Scalar.pi, (0.25 as Scalar) * Scalar.pi, (0.5 as Scalar) * Scalar.pi, Scalar.pi,
+                scales: .one, [ 2.0 as Scalar, -2.0 as Scalar ]
             )
 
             RunT3(
                 math,
-                quaternions: .zeroAngle, .init(angle: 0.1 * .pi, axis: .unitX), .init(angle: 0.25 * .pi, axis: .unitY), .init(angle: 0.5 * .pi, axis: .unitZ),
-                scales: .one, [ 2, -2, 2 ]
+                quaternions: .zeroAngle, .init(angle: (0.1 as Scalar) * Scalar.pi, axis: .unitX), .init(angle: (0.25 as Scalar) * Scalar.pi, axis: .unitY), .init(angle: (0.5 as Scalar) * Scalar.pi, axis: .unitZ),
+                scales: .one, [ 2.0 as Scalar, -2.0 as Scalar, 2.0 as Scalar ]
             )
         }
 
@@ -362,6 +366,52 @@ class KvTransformTests : XCTestCase {
                 quaternions: .zeroAngle, .init(angle: 0.1 * .pi, axis: .unitX), .init(angle: 0.25 * .pi, axis: .unitY), .init(angle: 0.5 * .pi, axis: .unitZ),
                 scales: .one, [ 2, -2, 2 ]
             )
+        }
+
+        Run(KvMathFloatScope.self)
+        Run(KvMathDoubleScope.self)
+    }
+
+
+
+    // MARK: .testDecompose
+
+    func testDecompose() {
+
+        func Run<Math : KvMathScope>(_ math: Math.Type) where Math.Scalar.RawSignificand : FixedWidthInteger {
+            typealias Scalar = Math.Scalar
+            typealias Matrix = Math.Matrix4x4
+            typealias Transform = KvTransform3<Math>
+
+            let scaleRange = (0.1 as Scalar) ... (10.0 as Scalar)
+            let shearRange = (0.5 as Scalar) ... (2.0 as Scalar)
+            let translationRange = (-10.0 as Scalar) ... (10.0 as Scalar)
+            let angleRange = (0.0 as Scalar) ..< ((2.0 as Scalar) * Scalar.pi)
+
+            (0..<25).forEach { _ in
+                let scale = Math.random3(in: scaleRange)
+                let shear = (xy: Scalar.random(in: shearRange), xz: Scalar.random(in: shearRange), yz: Scalar.random(in: shearRange))
+                let rotationMatrix = Math.Matrix3x3(Math.Quaternion(angle: Scalar.random(in: angleRange), axis: Math.Vector3.unitRandom()))
+                let translation = Math.random3(in: translationRange)
+
+                let scaleMatrix = Matrix([ scale.x           , 0.0 as Scalar     , 0.0 as Scalar, 0.0 as Scalar ],
+                                         [ scale.y * shear.xy, scale.y           , 0.0 as Scalar, 0.0 as Scalar ],
+                                         [ scale.z * shear.xz, scale.z * shear.yz, scale.z      , 0.0 as Scalar ],
+                                         .unitW)
+
+                let translationMatrix = Transform.makeMatrix(translation: translation)
+
+                let matrix = translationMatrix * Math.make4(rotationMatrix) * scaleMatrix
+
+                let decomposition = Transform.decompose(matrix)
+
+                XCTAssert(Math.isEqual(decomposition.scale, scale), "Decomposed scale \(decomposition.scale) is not equal to expected \(scale)")
+                XCTAssert(KvIs(decomposition.shear.xy, equalTo: shear.xy), "Decomposed shear.xy \(decomposition.shear.xy) is not equal to expected \(shear.xy)")
+                XCTAssert(KvIs(decomposition.shear.xz, equalTo: shear.xz), "Decomposed shear.xz \(decomposition.shear.xz) is not equal to expected \(shear.xz)")
+                XCTAssert(KvIs(decomposition.shear.yz, equalTo: shear.yz), "Decomposed shear.yz \(decomposition.shear.yz) is not equal to expected \(shear.yz)")
+                XCTAssert(Math.isEqual(decomposition.rotation, rotationMatrix), "Decomposed rotation \(decomposition.rotation) is not equal to expected \(rotationMatrix)")
+                XCTAssert(Math.isEqual(decomposition.translation, translation), "Decomposed translation \(decomposition.translation) is not equal to expected \(translation)")
+            }
         }
 
         Run(KvMathFloatScope.self)

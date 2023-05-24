@@ -81,7 +81,7 @@ public struct KvAffineTransform3<Math : KvMathScope> {
     /// Initializes product of rotation and scale transformations.
     @inlinable
     public init(quaternion: Math.Quaternion, scale: Vector) {
-        let scale⁻¹ = 1 / scale
+        let scale⁻¹ = (1.0 as Scalar) / scale
 
         var m = Matrix(quaternion)
         var m⁻¹ = m.transpose
@@ -104,7 +104,7 @@ public struct KvAffineTransform3<Math : KvMathScope> {
     /// Initializes a scale transformation.
     @inlinable
     public init(scale: Vector) {
-        let scale⁻¹ = 1 / scale
+        let scale⁻¹ = (1.0 as Scalar) / scale
 
         self.init(Matrix(diagonal: scale),
                   Matrix(diagonal: scale⁻¹),
@@ -123,10 +123,11 @@ public struct KvAffineTransform3<Math : KvMathScope> {
 
     /// - Returns: Scale component of given tranform matrix.
     ///
+    /// - Warning: Assuming the receiver has no shear component. Consider ``decompose(_:)`` method to extract scale from transformations having non-trivial shear component.
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable
     public static func scale(from m: Matrix) -> Vector {
-        Vector(x: Math.length(m[0]) * (KvIsNotNegative(m.determinant) ? 1 : -1),
+        Vector(x: Math.length(m[0]) * (KvIsNotNegative(m.determinant) ? (1.0 as Scalar) : (-1.0 as Scalar)),
                y: Math.length(m[1]),
                z: Math.length(m[2]))
     }
@@ -177,6 +178,54 @@ public struct KvAffineTransform3<Math : KvMathScope> {
 
 
 
+    // MARK: Decomposition
+
+    /// - Returns: Rotation, shear and scale components of the receiver.
+    ///
+    /// See: ``decompose()``.
+    public static func decompose(_ matrix: Matrix) -> (rotation: Matrix, shear: (xy: Scalar, xz: Scalar, yz: Scalar), scale: Vector) {
+        var (m0, m1, m2) = matrix.columns
+
+        let sx = Math.length(m0)
+        m0 /= sx
+
+        var sxy = Math.dot(m0, m1)
+        m1 -= sxy * m0
+
+        let sy = Math.length(m1)
+        do {
+            let sy⁻¹ = (1.0 as Scalar) / sy
+            m1 *= sy⁻¹
+            sxy *= sy⁻¹
+        }
+
+        var sxz = Math.dot(m0, m2)
+        var syz = Math.dot(m1, m2)
+        m2 -= sxz * m0
+        m2 -= syz * m1
+
+        let sz = Math.length(m2)
+        do {
+            let sz⁻¹ = (1.0 as Scalar) / sz
+            m2 *= sz⁻¹
+            sxz *= sz⁻¹
+            syz *= sz⁻¹
+        }
+
+        return (rotation: .init(m0, m1, m2), shear: (xy: sxy, xz: sxz, yz: syz), scale: .init(sx, sy, sz))
+    }
+
+
+    /// - Returns: Rotation, shear and scale components of the receiver.
+    ///
+    /// See: ``decompose(_:)``.
+    @inlinable
+    public func decompose() -> (rotation: Matrix, shear: (xy: Scalar, xz: Scalar, yz: Scalar), scale: Vector) {
+        Self.decompose(matrix)
+    }
+
+
+
     // MARK: Operations
 
     /// Transformed X basis vector.
@@ -203,6 +252,7 @@ public struct KvAffineTransform3<Math : KvMathScope> {
 
     /// Scale component of the receiver.
     ///
+    /// - Warning: Assuming the receiver has no shear component. Consider ``decompose()`` method to extract scale from transformations having non-trivial shear component.
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable public var scale: Vector { KvAffineTransform3.scale(from: matrix) }
 

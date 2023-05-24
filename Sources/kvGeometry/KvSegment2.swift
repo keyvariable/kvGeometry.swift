@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
+//  Copyright (c) 2023 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -15,29 +15,29 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  KvSegment3.swift
+//  KvSegment2.swift
 //  kvGeometry
 //
-//  Created by Svyatoslav Popov on 27.10.2022.
+//  Created by Svyatoslav Popov on 21.05.2023.
 //
 
 import kvKit
 
 
 
-/// Implementation of a segment in 3D coordinate space.
+/// Implementation of a segment in 2D coordinate space.
 ///
 /// The segment coordinates are represented with *endPoints.0* + *direction* · *step* equation where *step* ∈ [0, *length*]. See ``at(_:)`` method.
-public struct KvSegment3<Vertex : KvVertex3Protocol> {
+public struct KvSegment2<Vertex : KvVertex2Protocol> {
 
     public typealias Math = Vertex.Math
     public typealias Vertex = Vertex
 
     public typealias Scalar = Math.Scalar
-    public typealias Vector = Math.Vector3
+    public typealias Vector = Math.Vector2
 
-    public typealias Transform = KvTransform3<Math>
-    public typealias AffineTransform = KvAffineTransform3<Math>
+    public typealias Transform = KvTransform2<Math>
+    public typealias AffineTransform = KvAffineTransform2<Math>
 
 
 
@@ -114,18 +114,18 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     @inlinable public func flipped() -> Self { Self(endPoints: (endPoints.0.flipped(), endPoints.1.flipped()), direction: front, length: length, length⁻¹: length⁻¹) }
 
 
-    /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given plane.
+    /// - Returns: Step *t* where `at(t)` is a coordinate the receiver intersects given line.
     ///
     /// - Note: It's equal to distance from *endPoints.0* to the intersection coordinate.
     ///
     /// See ``at(_:)``, ``intersection(with:)``, ``intersects(with:)``.
     @inlinable
-    public func step(to plane: KvPlane3<Math>) -> Scalar? {
-        let divider = Math.dot(plane.normal, front)
+    public func step(to line: KvLine2<Math>) -> Scalar? {
+        let divider = Math.dot(line.normal, front)
 
         guard KvIsNonzero(divider) else { return nil }
 
-        let t = -plane.at(endPoints.0.coordinate) / divider
+        let t = -line.at(endPoints.0.coordinate) / divider
 
         guard contains(step: t) else { return nil }
 
@@ -158,7 +158,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     /// - Returns: Distance to a vertex.
     @inlinable
     public func distance<V>(to vertex: V) -> Scalar
-    where V : KvVertex3Protocol, V.Math == Math {
+    where V : KvVertex2Protocol, V.Math == Math {
         distance(to: vertex.coordinate)
     }
 
@@ -168,12 +168,12 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
         let (lFront, lOrigin) = (front, endPoints.0.coordinate)
         let (rFront, rOrigin) = (segment.front, segment.endPoints.0.coordinate)
 
-        let n = Math.cross(lFront, rFront)
-        let denominator = Math.length²(n)
+        let nz = Math.cross(lFront, rFront).z
+        let denominator = sqr(nz)
 
         switch KvIsNonzero(denominator) {
         case true:
-            let cross = Math.cross(n, rOrigin - lOrigin)
+            let cross: Vector = nz * { v -> Vector in Vector(-v.y, v.x) }(rOrigin - lOrigin)    // Math.cross(n, rOrigin - lOrigin)
             let denominator⁻¹ = 1.0 as Scalar / denominator
 
             let lt = Math.dot(rFront, cross) * denominator⁻¹
@@ -184,7 +184,12 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
             // Closest coordinate to the intersection on `segment`.
             let rc = segment.coordinate(at: clamp(rt, 0.0 as Scalar, segment.length))
 
-            return min(segment.distance(to: lc), distance(to: rc))
+            return min(segment.distance(to: lc),
+                       segment.distance(to: endPoints.0.coordinate),
+                       segment.distance(to: endPoints.1.coordinate),
+                       distance(to: rc),
+                       distance(to: segment.endPoints.0.coordinate),
+                       distance(to: segment.endPoints.1.coordinate))
 
         case false:
             let v00 = segment.endPoints.0.coordinate - endPoints.0.coordinate
@@ -198,7 +203,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
             guard KvIs(p0, lessThan: length) else { return Math.distance(endPoints.1.coordinate, segment.endPoints.0.coordinate) }
 
             // It's true due to direction is a unit vector.
-            return Math.length(Math.cross(v00, front))
+            return -Math.cross(v00, front).z
         }
     }
 
@@ -214,7 +219,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     public func contains(_ coordinate: Vertex.Coordinate) -> Bool {
         let arg = (vector: coordinate - endPoints.0.coordinate, epsArg: Math.epsArg(coordinate) - Math.epsArg(endPoints.0.coordinate))
 
-        guard Math.isZero(Math.cross(front, arg.vector), eps: Math.epsArg(front).cross(arg.epsArg).tolerance) else { return false }
+        guard KvIsZero(Math.cross(front, arg.vector).z, eps: Math.epsArg(front).cross(arg.epsArg).tolerance) else { return false }
 
         return contains(step: Math.dot(front, arg.vector))
     }
@@ -223,18 +228,18 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
     @inlinable public func contains(_ vertex: Vertex) -> Bool { contains(vertex.coordinate) }
 
 
-    /// - Returns: A boolean value indicating whether the receiver intersects given plane.
+    /// - Returns: A boolean value indicating whether the receiver intersects given line.
     ///
     /// See ``step(to:)``, ``intersection(with:)``.
-    @inlinable public func intersects(with plane: KvPlane3<Math>) -> Bool { step(to: plane) != nil }
+    @inlinable public func intersects(with line: KvLine2<Math>) -> Bool { step(to: line) != nil }
 
 
-    /// - Returns: A copy of the origin translated to coordinate where the receiver and given plane intersect.
+    /// - Returns: A copy of the origin translated to coordinate where the receiver and given line intersect.
     ///
     /// See ``step(to:)``, ``intersects(with:)``.
     @inlinable
-    public func intersection(with plane: KvPlane3<Math>) -> Vertex? {
-        step(to: plane).map(self.at(_:))
+    public func intersection(with line: KvLine2<Math>) -> Vertex? {
+        step(to: line).map(self.at(_:))
     }
 
 
@@ -278,7 +283,7 @@ public struct KvSegment3<Vertex : KvVertex3Protocol> {
 
 // MARK: : KvNumericallyEquatable
 
-extension KvSegment3 : KvNumericallyEquatable where Vertex : KvNumericallyEquatable {
+extension KvSegment2 : KvNumericallyEquatable where Vertex : KvNumericallyEquatable {
 
     /// - Returns: A boolean value indicating whether the receiver and *rhs* are numerically equal.
     ///
@@ -295,8 +300,8 @@ extension KvSegment3 : KvNumericallyEquatable where Vertex : KvNumericallyEquata
     ///
     /// - Note: Segments having common end-points in different order are numerically equal.
     @inlinable
-    public func isEqual<V>(to rhs: KvSegment3<V>) -> Bool
-    where V : KvVertex3Protocol, V.Math == Vertex.Math
+    public func isEqual<V>(to rhs: KvSegment2<V>) -> Bool
+    where V : KvVertex2Protocol, V.Math == Vertex.Math
     {
         Math.isEqual(endPoints.0.coordinate, rhs.endPoints.0.coordinate)
         ? Math.isEqual(endPoints.1.coordinate, rhs.endPoints.1.coordinate)
@@ -310,7 +315,7 @@ extension KvSegment3 : KvNumericallyEquatable where Vertex : KvNumericallyEquata
 
 // MARK: : Equatable
 
-extension KvSegment3 : Equatable where Vertex : Equatable {
+extension KvSegment2 : Equatable where Vertex : Equatable {
 
     /// - Returns: A boolean value indicating whether two instances have the same `.endPoints` properties.
     @inlinable static public func ==(lhs: Self, rhs: Self) -> Bool { lhs.endPoints == rhs.endPoints }
@@ -321,7 +326,7 @@ extension KvSegment3 : Equatable where Vertex : Equatable {
 
 // MARK: : Hashable
 
-extension KvSegment3 : Hashable where Vertex : Hashable {
+extension KvSegment2 : Hashable where Vertex : Hashable {
 
     @inlinable
     public func hash(into hasher: inout Hasher) {

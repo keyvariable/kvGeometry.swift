@@ -67,7 +67,13 @@ public struct KvViewingFrustum<Math : KvMathScope> {
         top = Plane(abcd: m[3] - m[1])
 
         near = Plane(abcd: m[3] + m[2])
-        far = Plane(abcd: m[3] - m[2])
+        do {
+            let far = Plane(abcd: m[3] - m[2])
+
+            self.far = (!far.isDegenerate
+                        ? far
+                        : Plane(normal: -near.normal, d: near.d < (0.0 as Scalar) ? Scalar.infinity : -Scalar.infinity))
+        }
     }
 
 
@@ -94,17 +100,23 @@ public struct KvViewingFrustum<Math : KvMathScope> {
     // MARK: Auxiliaries
 
     /// The zero frustum containing zero point only.
-    public static var zero: Self { .init(left:   Plane(abcd: [ 1, 0, 0, 0 ]), right: Plane(abcd: [ -1, 0, 0, 0 ]),
-                                         bottom: Plane(abcd: [ 0, 1, 0, 0 ]), top:   Plane(abcd: [ 0, -1, 0, 0 ]),
-                                         near:   Plane(abcd: [ 0, 0, 1, 0 ]), far:   Plane(abcd: [ 0, 0, -1, 0 ])) }
+    public static var zero: Self { .init(
+        left:   Plane(abcd: [ 1.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar ]), right: Plane(abcd: [ -1.0 as Scalar,  0.0 as Scalar,  0.0 as Scalar, 0.0 as Scalar ]),
+        bottom: Plane(abcd: [ 0.0 as Scalar, 1.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar ]), top:   Plane(abcd: [  0.0 as Scalar, -1.0 as Scalar,  0.0 as Scalar, 0.0 as Scalar ]),
+        near:   Plane(abcd: [ 0.0 as Scalar, 0.0 as Scalar, 1.0 as Scalar, 0.0 as Scalar ]), far:   Plane(abcd: [  0.0 as Scalar,  0.0 as Scalar, -1.0 as Scalar, 0.0 as Scalar ])
+    ) }
     /// The null frustum containing nothing.
-    public static var null: Self { .init(left:   Plane(abcd: [ 1, 0, 0, -1 ]), right: Plane(abcd: [ -1, 0, 0, -1 ]),
-                                         bottom: Plane(abcd: [ 0, 1, 0, -1 ]), top:   Plane(abcd: [ 0, -1, 0, -1 ]),
-                                         near:   Plane(abcd: [ 0, 0, 1, -1 ]), far:   Plane(abcd: [ 0, 0, -1, -1 ])) }
+    public static var null: Self { .init(
+        left:   Plane(abcd: [ 1.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar, -1.0 as Scalar ]), right: Plane(abcd: [ -1.0 as Scalar,  0.0 as Scalar,  0.0 as Scalar, -1.0 as Scalar ]),
+        bottom: Plane(abcd: [ 0.0 as Scalar, 1.0 as Scalar, 0.0 as Scalar, -1.0 as Scalar ]), top:   Plane(abcd: [  0.0 as Scalar, -1.0 as Scalar,  0.0 as Scalar, -1.0 as Scalar ]),
+        near:   Plane(abcd: [ 0.0 as Scalar, 0.0 as Scalar, 1.0 as Scalar, -1.0 as Scalar ]), far:   Plane(abcd: [  0.0 as Scalar,  0.0 as Scalar, -1.0 as Scalar, -1.0 as Scalar ])
+    ) }
     /// Frustum containing all the space.
-    public static var infinite: Self { .init(left:   Plane(abcd: [ 1, 0, 0, .infinity ]), right: Plane(abcd: [ -1, 0, 0, .infinity ]),
-                                             bottom: Plane(abcd: [ 0, 1, 0, .infinity ]), top:   Plane(abcd: [ 0, -1, 0, .infinity ]),
-                                             near:   Plane(abcd: [ 0, 0, 1, .infinity ]), far:   Plane(abcd: [ 0, 0, -1, .infinity ])) }
+    public static var infinite: Self { .init(
+        left:   Plane(abcd: [ 1.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar, Scalar.infinity ]), right: Plane(abcd: [ -1.0 as Scalar,  0.0 as Scalar,  0.0 as Scalar, Scalar.infinity ]),
+        bottom: Plane(abcd: [ 0.0 as Scalar, 1.0 as Scalar, 0.0 as Scalar, Scalar.infinity ]), top:   Plane(abcd: [  0.0 as Scalar, -1.0 as Scalar,  0.0 as Scalar, Scalar.infinity ]),
+        near:   Plane(abcd: [ 0.0 as Scalar, 0.0 as Scalar, 1.0 as Scalar, Scalar.infinity ]), far:   Plane(abcd: [  0.0 as Scalar,  0.0 as Scalar, -1.0 as Scalar, Scalar.infinity ])
+    ) }
 
 
 
@@ -176,12 +188,12 @@ public struct KvViewingFrustum<Math : KvMathScope> {
     /// - Returns: A copy of the receiver where planes are shifted by given offset.
     @inlinable
     public func inset(by d: Scalar) -> Self {
-        .init(left: left.translated(by: left.normal * d),
-              right: right.translated(by: right.normal * d),
-              bottom: bottom.translated(by: bottom.normal * d),
-              top: top.translated(by: top.normal * d),
-              near: near.translated(by: near.normal * d),
-              far: far.translated(by: far.normal * d))
+        .init(left: left.translated(by: d),
+              right: right.translated(by: d),
+              bottom: bottom.translated(by: d),
+              top: top.translated(by: d),
+              near: near.translated(by: d),
+              far: far.translated(by: d))
     }
 
 }

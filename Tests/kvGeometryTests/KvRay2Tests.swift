@@ -32,8 +32,6 @@ import kvTestKit
 
 class KvRay2Tests : XCTestCase {
 
-    typealias L<Math : KvMathScope> = KvLine2<Math>
-
     typealias Vertex<Math : KvMathScope> = KvPosition2<Math, Void>
     typealias Ray<Math : KvMathScope> = KvRay2<Vertex<Math>>
 
@@ -68,36 +66,6 @@ class KvRay2Tests : XCTestCase {
             Assert(.init(in: -.unitX, at: [ 10, 1 ]), 0)
             Assert(.init(in: -.unitX, at: [ 1, 10 ]), nil)
             Assert(.init(in: -.unitX, at: [ 10, 0 ]), nil)
-        }
-
-        Run(KvMathFloatScope.self)
-        Run(KvMathDoubleScope.self)
-    }
-
-
-
-    // MARK: .contains Coordiante Tests
-
-    func testContainsCoordinate() {
-
-        func Run<Math : KvMathScope>(_ math: Math.Type)
-        where Math.Scalar.RawSignificand : FixedWidthInteger
-        {
-            (0..<50).forEach { _ in
-                let line = L<Math>(in: Math.randomNonzero2(in: -10...10),
-                                   at: Math.random2(in: -100...100))
-
-                var t: Math.Scalar = -100
-                while t <= 100 {
-                    defer { t += 25 }
-
-                    let c_in = line.closestToOrigin + t * line.front
-                    XCTAssert(line.contains(c_in), "contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_in)")
-
-                    let c_out = c_in + 1e-3 * line.normal
-                    XCTAssert(!line.contains(c_out), "!contains: line = (in: \(line.front), at: \(line.closestToOrigin)), c = \(c_out)")
-                }
-            }
         }
 
         Run(KvMathFloatScope.self)

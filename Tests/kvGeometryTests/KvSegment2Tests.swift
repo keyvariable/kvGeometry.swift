@@ -1,6 +1,6 @@
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2022 Svyatoslav Popov (info@keyvar.com).
+//  Copyright (c) 2023 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -15,10 +15,10 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  KvSegment3Tests.swift
+//  KvSegment2Tests.swift
 //  kvGeometry
 //
-//  Created by Svyatoslav Popov on 28.10.2022.
+//  Created by Svyatoslav Popov on 22.05.2023.
 //
 
 import XCTest
@@ -30,10 +30,10 @@ import kvTestKit
 
 
 
-class KvSegment3Tests : XCTestCase {
+class KvSegment2Tests : XCTestCase {
 
-    typealias V<Math : KvMathScope> = KvPosition3<Math, Void>
-    typealias S<Math : KvMathScope> = KvSegment3<V<Math>>
+    typealias V<Math : KvMathScope> = KvPosition2<Math, Void>
+    typealias S<Math : KvMathScope> = KvSegment2<V<Math>>
 
 
 
@@ -57,7 +57,7 @@ class KvSegment3Tests : XCTestCase {
         func Run<Math : KvMathScope>(_ math: Math.Type) {
             typealias Scalar = Math.Scalar
 
-            let s = S<Math>(.zero, [ 1, 2, 3 ])
+            let s = S<Math>(.zero, [ 1, 2 ])
             let step = (small: (0.0 as Scalar).distance(to: 0.05 as Scalar),
                         large: (0.0 as Scalar).distance(to: 0.5 as Scalar) )
 
@@ -88,7 +88,7 @@ class KvSegment3Tests : XCTestCase {
     func testDegenerate() {
 
         func Run<Math : KvMathScope>(_ math: Math.Type) {
-            let v: V<Math> = [ 1, 2, 3 ]
+            let v: V<Math> = [ 1, 2 ]
             let s = S<Math>(v, v)
 
             XCTAssert(s.contains(v))
@@ -108,41 +108,36 @@ class KvSegment3Tests : XCTestCase {
 
             let cases: [(lhs: S<Math>, rhs: S<Math>, distance: Math.Scalar)] = [
                 // The same segments
-                (lhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), rhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 1, 0 ]), rhs: S<Math>([ 0, 0 ], [ 1, 0 ]), distance: 0),
                 // Intersecting arguments on the same line.
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([  1, 0, 0 ], [ 3, 0, 0 ]), distance: 0),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([  2, 0, 0 ], [ 4, 0, 0 ]), distance: 0),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ -1, 0, 0 ], [ 1, 0, 0 ]), distance: 0),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ -2, 0, 0 ], [ 0, 0, 0 ]), distance: 0),
-                (lhs: S<Math>([ 1, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([  0, 0, 0 ], [ 3, 0, 0 ]), distance: 0),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([  1, 0, 0 ], [ 2, 0, 0 ]), distance: 0),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([  1, 0, 0 ], [ 1, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([  1, 0 ], [ 3, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([  2, 0 ], [ 4, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([ -1, 0 ], [ 1, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([ -2, 0 ], [ 0, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 1, 0 ], [ 2, 0 ]), rhs: S<Math>([  0, 0 ], [ 3, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 3, 0 ]), rhs: S<Math>([  1, 0 ], [ 2, 0, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 3, 0 ]), rhs: S<Math>([  1, 0 ], [ 1, 0, 0 ]), distance: 0),
                 // Intersecting arguments on different lines.
-                (lhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), rhs: S<Math>([ 0, 0, 0 ], [ 0, 1, 0 ]), distance: 0),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), rhs: S<Math>([ 1, 0, 0 ], [ 1, 0, 1 ]), distance: 0),
-                (lhs: S<Math>([ 0, 1, 0 ], [ 2, 1, 0 ]), rhs: S<Math>([ 1, 0, 0 ], [ 1, 2, 0 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 1, 0 ]), rhs: S<Math>([ 0, 0 ], [ 0, 1 ]), distance: 0),
+                (lhs: S<Math>([ 0, 0 ], [ 1, 0 ]), rhs: S<Math>([ 1, 0 ], [ 1, 1 ]), distance: 0),
+                (lhs: S<Math>([ 0, 1 ], [ 2, 1 ]), rhs: S<Math>([ 1, 0 ], [ 1, 2 ]), distance: 0),
                 // Non-intersecting arguments on the same line.
-                (lhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), rhs: S<Math>([ 2, 0, 0 ], [ 3, 0, 0 ]), distance: 1),
+                (lhs: S<Math>([ 0, 0 ], [ 1, 0 ]), rhs: S<Math>([ 2, 0 ], [ 3, 0 ]), distance: 1),
                 // Collinear arguments.
-                (lhs: S<Math>([ 2, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([ 2, 1, 0 ], [ 5, 1, 0 ]), distance: 1),
-                (lhs: S<Math>([ 2, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([ 3, 1, 0 ], [ 5, 1, 0 ]), distance: 1),
-                (lhs: S<Math>([ 2, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([ 4, 1, 0 ], [ 5, 1, 0 ]), distance: sqrt2),
-                (lhs: S<Math>([ 2, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([ 0, 1, 0 ], [ 2, 1, 0 ]), distance: 1),
-                (lhs: S<Math>([ 2, 0, 0 ], [ 3, 0, 0 ]), rhs: S<Math>([ 0, 1, 0 ], [ 1, 1, 0 ]), distance: sqrt2),
+                (lhs: S<Math>([ 2, 0 ], [ 3, 0 ]), rhs: S<Math>([ 2, 1 ], [ 5, 1 ]), distance: 1),
+                (lhs: S<Math>([ 2, 0 ], [ 3, 0 ]), rhs: S<Math>([ 3, 1 ], [ 5, 1 ]), distance: 1),
+                (lhs: S<Math>([ 2, 0 ], [ 3, 0 ]), rhs: S<Math>([ 4, 1 ], [ 5, 1 ]), distance: sqrt2),
+                (lhs: S<Math>([ 2, 0 ], [ 3, 0 ]), rhs: S<Math>([ 0, 1 ], [ 2, 1 ]), distance: 1),
+                (lhs: S<Math>([ 2, 0 ], [ 3, 0 ]), rhs: S<Math>([ 0, 1 ], [ 1, 1 ]), distance: sqrt2),
                 // Non-collinear non-intersecting arguments.
-                (lhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), rhs: S<Math>([ 0,  0, 1 ], [ 0,  1, 1 ]), distance: 1),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 1, 0, 0 ]), rhs: S<Math>([ 1,  0, 1 ], [ 1,  1, 1 ]), distance: 1),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ 1,  0, 1 ], [ 1,  2, 1 ]), distance: 1),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ 1,  1, 1 ], [ 1,  3, 1 ]), distance: sqrt2),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ 1, -1, 1 ], [ 1, -3, 1 ]), distance: sqrt2),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ 1,  3, 0 ], [ 5, -1, 0 ]), distance: sqrt2),
-                (lhs: S<Math>([ 2, 0, 0 ], [ 0, 0, 0 ]), rhs: S<Math>([ 1,  3, 0 ], [ 5, -1, 0 ]), distance: sqrt2),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ 1, -3, 0 ], [ 5,  1, 0 ]), distance: sqrt2),
-                (lhs: S<Math>([ 2, 0, 0 ], [ 0, 0, 0 ]), rhs: S<Math>([ 1, -3, 0 ], [ 5,  1, 0 ]), distance: sqrt2),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ -1, 5, 0 ], [  1,  3, 0 ]), distance: 3),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([ -2, 6, 0 ], [ -1,  5, 0 ]), distance: Math.distance(Math.Vector2.zero, [ -1, 5 ])),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([  4, 0, 0 ], [  5, -1, 0 ]), distance: 2),
-                (lhs: S<Math>([ 0, 0, 0 ], [ 2, 0, 0 ]), rhs: S<Math>([  2, 2, 0 ], [  4,  0, 0 ]), distance: sqrt2),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([ 1,  3 ], [ 5, -1 ]), distance: sqrt2),
+                (lhs: S<Math>([ 2, 0 ], [ 0, 0 ]), rhs: S<Math>([ 1,  3 ], [ 5, -1 ]), distance: sqrt2),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([ 1, -3 ], [ 5,  1 ]), distance: sqrt2),
+                (lhs: S<Math>([ 2, 0 ], [ 0, 0 ]), rhs: S<Math>([ 1, -3 ], [ 5,  1 ]), distance: sqrt2),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([ -1,  5 ], [  1,  3 ]), distance: 3),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([ -2,  6 ], [ -1,  5 ]), distance: Math.distance(Math.Vector2.zero, [ -1, 5 ])),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([  4,  0 ], [  5, -1 ]), distance: 2),
+                (lhs: S<Math>([ 0, 0 ], [ 2, 0 ]), rhs: S<Math>([  2,  2 ], [  4,  0 ]), distance: sqrt2),
             ]
 
             cases.forEach { (lhs, rhs, expected) in

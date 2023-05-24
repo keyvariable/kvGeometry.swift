@@ -1,4 +1,4 @@
-# kvGeometry
+# kvGeometry.swift
 
 ![Swift 5.2](https://img.shields.io/badge/swift-5.2-green.svg)
 ![Linux](https://img.shields.io/badge/os-linux-green.svg)
@@ -25,7 +25,7 @@ This package is completely crossplatform.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/keyvariable/kvGeometry.swift.git", from: "0.1.1"),
+    .package(url: "https://github.com/keyvariable/kvGeometry.swift.git", from: "0.2.0"),
 ]
 ```
 

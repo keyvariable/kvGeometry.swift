@@ -15,7 +15,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  KvConvexPolygonTests.swift
+//  KvConvex2Tests.swift
 //  kvGeometry
 //
 //  Created by Svyatoslav Popov on 14.09.2022.

@@ -111,7 +111,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// Initializes product of rotation and scale transformations.
     @inlinable
     public init(quaternion: Math.Quaternion, scale: Vector) {
-        let scale⁻¹ = Matrix.Column(1 / scale, 1)
+        let scale⁻¹ = Matrix.Column((1.0 as Scalar) / scale, 1.0 as Scalar)
 
         var m = Matrix(quaternion)
         var m⁻¹ = m.transpose
@@ -134,11 +134,11 @@ public struct KvTransform3<Math : KvMathScope> {
     /// Initializes a scale transformation.
     @inlinable
     public init(scale: Vector) {
-        let scale⁻¹ = 1 / scale
+        let scale⁻¹ = (1.0 as Scalar) / scale
 
         self.init(
-            Matrix(diagonal: Matrix.Diagonal(scale, 1)),
-            Matrix(diagonal: Matrix.Diagonal(scale⁻¹, 1)),
+            Matrix(diagonal: Matrix.Diagonal(scale, 1.0 as Scalar)),
+            Matrix(diagonal: Matrix.Diagonal(scale⁻¹, 1.0 as Scalar)),
             NormalMatrix(diagonal: KvAffineTransform3<Math>.normalizedScaleComponent(for: scale⁻¹))
         )
     }
@@ -154,11 +154,11 @@ public struct KvTransform3<Math : KvMathScope> {
             Matrix(.unitX,
                    .unitY,
                    .unitZ,
-                   Matrix.Column(translation, 1)),
+                   Matrix.Column(translation, 1.0 as Scalar)),
             Matrix(.unitX,
                    .unitY,
                    .unitZ,
-                   Matrix.Column(-translation, 1)),
+                   Matrix.Column(-translation, 1.0 as Scalar)),
             .identity
         )
     }
@@ -175,11 +175,11 @@ public struct KvTransform3<Math : KvMathScope> {
             Matrix(Math.make4(r[0]),
                    Math.make4(r[1]),
                    Math.make4(r[2]),
-                   Matrix.Column(translation, 1)),
+                   Matrix.Column(translation, 1.0 as Scalar)),
             Matrix(Math.make4(r⁻¹[0]),
                    Math.make4(r⁻¹[1]),
                    Math.make4(r⁻¹[2]),
-                   Matrix.Column(Math.dot(r[0], t⁻¹), Math.dot(r[1], t⁻¹), Math.dot(r[2], t⁻¹), 1)),
+                   Matrix.Column(Math.dot(r[0], t⁻¹), Math.dot(r[1], t⁻¹), Math.dot(r[2], t⁻¹), 1.0 as Scalar)),
             r
         )
     }
@@ -191,8 +191,8 @@ public struct KvTransform3<Math : KvMathScope> {
         var r = NormalMatrix(quaternion)
         var r⁻¹ = r.transpose
 
-        let scale⁻¹ = 1 / scale
-        let t⁻¹ = (r⁻¹ * -translation) * scale⁻¹
+        let scale⁻¹: Vector = (1.0 as Scalar) / scale
+        let t⁻¹: Vector = ((r⁻¹ * (-translation as Vector)) as Vector) * scale⁻¹
 
         r[0] *= scale.x
         r[1] *= scale.y
@@ -206,11 +206,11 @@ public struct KvTransform3<Math : KvMathScope> {
             Matrix(Math.make4(r[0]),
                    Math.make4(r[1]),
                    Math.make4(r[2]),
-                   Matrix.Column(translation, 1)),
+                   Matrix.Column(translation, 1.0 as Scalar)),
             inverseMatrix: Matrix(Math.make4(r⁻¹[0]),
                                   Math.make4(r⁻¹[1]),
                                   Math.make4(r⁻¹[2]),
-                                  Matrix.Column(t⁻¹, 1))
+                                  Matrix.Column(t⁻¹, 1.0 as Scalar))
         )
     }
 
@@ -224,17 +224,17 @@ public struct KvTransform3<Math : KvMathScope> {
     /// Initializes product of translation and scale transformations.
     @inlinable
     public init(translation: Vector, scale: Vector) {
-        let scale⁻¹ = 1 / scale
+        let scale⁻¹ = (1.0 as Scalar) / scale
 
         self.init(
-            Matrix(Matrix.Column(scale.x, 0, 0, 0),
-                   Matrix.Column(0, scale.y, 0, 0),
-                   Matrix.Column(0, 0, scale.z, 0),
-                   Matrix.Column(translation, 1)),
-            Matrix(Matrix.Column(scale⁻¹.x, 0, 0, 0),
-                   Matrix.Column(0, scale⁻¹.y, 0, 0),
-                   Matrix.Column(0, 0, scale⁻¹.z, 0),
-                   Matrix.Column(-translation * scale⁻¹, 1)),
+            Matrix(Matrix.Column(      scale.x, 0.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar),
+                   Matrix.Column(0.0 as Scalar,       scale.y, 0.0 as Scalar, 0.0 as Scalar),
+                   Matrix.Column(0.0 as Scalar, 0.0 as Scalar,       scale.z, 0.0 as Scalar),
+                   Matrix.Column(translation, 1.0 as Scalar)),
+            Matrix(Matrix.Column(    scale⁻¹.x, 0.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar),
+                   Matrix.Column(0.0 as Scalar,     scale⁻¹.y, 0.0 as Scalar, 0.0 as Scalar),
+                   Matrix.Column(0.0 as Scalar, 0.0 as Scalar,     scale⁻¹.z, 0.0 as Scalar),
+                   Matrix.Column(-translation * scale⁻¹, 1.0 as Scalar)),
             NormalMatrix(diagonal: KvAffineTransform3<Math>.normalizedScaleComponent(for: scale⁻¹))
         )
     }
@@ -253,10 +253,11 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Returns: Scale component of given tranform matrix.
     ///
     /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    /// - Warning: Assuming the receiver has no shear component. Consider ``decompose(_:)`` method to extract scale from transformations having non-trivial shear component.
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable
     public static func scale(from m: Matrix) -> Vector {
-        Vector(x: Math.length(m[0]) * (KvIsNotNegative(m.determinant) ? 1 : -1),
+        Vector(x: Math.length(m[0]) * (KvIsNotNegative(m.determinant) ? (1.0 as Scalar) : (-1.0 as Scalar)),
                y: Math.length(m[1]),
                z: Math.length(m[2]))
     }
@@ -272,7 +273,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Returns: Transformed coordinate by a transformation represented as given matrix.
     @inlinable
     public static func act(_ matrix: Matrix, coordinate c: Vector) -> Vector {
-        let c4 = matrix * Matrix.Column(c, 1)
+        let c4 = matrix * Matrix.Column(c, 1.0 as Scalar)
         return Math.make3(c4) / c4.w
     }
 
@@ -292,7 +293,7 @@ public struct KvTransform3<Math : KvMathScope> {
         Matrix(Math.make4(a[0]),
                Math.make4(a[1]),
                Math.make4(a[2]),
-               Matrix.Column(translation, 1))
+               Matrix.Column(translation, 1.0 as Scalar))
     }
 
 
@@ -324,21 +325,21 @@ public struct KvTransform3<Math : KvMathScope> {
 
 
     /// - Returns: Scale transformation matrix.
-    @inlinable public static func makeMatrix(scale: Vector) -> Matrix { Matrix(diagonal: Matrix.Diagonal(scale, 1)) }
+    @inlinable public static func makeMatrix(scale: Vector) -> Matrix { Matrix(diagonal: Matrix.Diagonal(scale, 1.0 as Scalar)) }
 
     /// - Returns: Scale transformation matrix.
-    @inlinable public static func makeMatrix(scale: Scalar) -> Matrix { Matrix(diagonal: Matrix.Diagonal(scale, scale, scale, 1)) }
+    @inlinable public static func makeMatrix(scale: Scalar) -> Matrix { Matrix(diagonal: Matrix.Diagonal(scale, scale, scale, 1.0 as Scalar)) }
 
 
     /// - Returns: Translation transformation matrix.
-    @inlinable public static func makeMatrix(translation: Vector) -> Matrix { Matrix(.unitX, .unitY, .unitZ, Matrix.Column(translation, 1)) }
+    @inlinable public static func makeMatrix(translation: Vector) -> Matrix { Matrix(.unitX, .unitY, .unitZ, Matrix.Column(translation, 1.0 as Scalar)) }
 
 
     /// - Returns: Translation-rotation transformation matrix.
     @inlinable
     public static func makeMatrix(translation: Vector, quaternion: Math.Quaternion) -> Matrix {
         var m = Matrix(quaternion)
-        m[3] = Matrix.Column(translation, 1)
+        m[3] = Matrix.Column(translation, 1.0 as Scalar)
         return m
     }
 
@@ -350,7 +351,7 @@ public struct KvTransform3<Math : KvMathScope> {
         m[0] *= scale.x
         m[1] *= scale.y
         m[2] *= scale.z
-        m[3] = Matrix.Column(translation, 1)
+        m[3] = Matrix.Column(translation, 1.0 as Scalar)
         return m
     }
 
@@ -364,10 +365,10 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Returns: Translation-scale transformation matrix.
     @inlinable
     public static func makeMatrix(translation: Vector, scale: Vector) -> Matrix {
-        Matrix(Matrix.Column(scale.x, 0, 0, 0),
-               Matrix.Column(0, scale.y, 0, 0),
-               Matrix.Column(0, 0, scale.z, 0),
-               Matrix.Column(translation, 1))
+        Matrix(Matrix.Column(      scale.x, 0.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar),
+               Matrix.Column(0.0 as Scalar,       scale.y, 0.0 as Scalar, 0.0 as Scalar),
+               Matrix.Column(0.0 as Scalar, 0.0 as Scalar,       scale.z, 0.0 as Scalar),
+               Matrix.Column(translation, 1.0 as Scalar))
     }
 
     /// - Returns: Translation-scale transformation matrix.
@@ -380,11 +381,11 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Returns: Matrix of standard orthogonal projection.
     @inlinable
     public static func orthogonalProjectionMatrix(left: Scalar, right: Scalar, top: Scalar, bottom: Scalar, near: Scalar, far: Scalar) -> Matrix {
-        Matrix(diagonal: 1 / Matrix.Diagonal(left - right, bottom - top, near - far, 1))
-        * Matrix([ -2,  0, 0, 0 ],
-                 [  0, -2, 0, 0 ],
-                 [  0,  0, 2, 0 ],
-                 Matrix.Column(right + left, top + bottom, far + near, 1))
+        Matrix(diagonal: (1.0 as Scalar) / Matrix.Diagonal(left - right, bottom - top, near - far, 1.0 as Scalar))
+        * Matrix([ -2.0 as Scalar,  0.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar ],
+                 [  0.0 as Scalar, -2.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar ],
+                 [  0.0 as Scalar,  0.0 as Scalar, 2.0 as Scalar, 0.0 as Scalar ],
+                 Matrix.Column(right + left, top + bottom, far + near, 1.0 as Scalar))
     }
 
 
@@ -394,13 +395,13 @@ public struct KvTransform3<Math : KvMathScope> {
     /// - Returns: Projection matrix for a centered rectangular pinhole camera.
     @inlinable
     public static func perspectiveProjectionMatrix(aspect: Scalar, fov: Scalar, near: Scalar, far: Scalar) -> Matrix {
-        let tg = Math.tan(0.5 * fov)
+        let tg = Math.tan((0.5 as Scalar) * fov)
 
-        return (Matrix(diagonal: 1 / Matrix.Diagonal(aspect * tg, tg, near - far, 1))
+        return (Matrix(diagonal: (1.0 as Scalar) / Matrix.Diagonal(aspect * tg, tg, near - far, 1.0 as Scalar))
                 * Matrix(Matrix.Column.unitX,
                          Matrix.Column.unitY,
-                         Matrix.Column(0,  0,  (far + near)  , -1),
-                         Matrix.Column(0,  0,  2 * far * near,  0)))
+                         Matrix.Column(0.0 as Scalar, 0.0 as Scalar,                 (far + near), -1.0 as Scalar),
+                         Matrix.Column(0.0 as Scalar, 0.0 as Scalar, (2.0 as Scalar) * far * near,  0.0 as Scalar)))
     }
 
 
@@ -414,10 +415,36 @@ public struct KvTransform3<Math : KvMathScope> {
     public static func projectiveCameraMatrix(k: Math.Matrix3x3, near: Scalar, far: Scalar) -> Matrix {
         // - Note: Implementation below uses full K matrix. It seems better then picking some elements if K.
         Matrix(.unitX, .unitY, .unitW, .unitZ)
-        * Matrix(Matrix.Column(k[0], 0),
-                 Matrix.Column(k[1], 0),
+        * Matrix(Matrix.Column(k[0], 0.0 as Scalar),
+                 Matrix.Column(k[1], 0.0 as Scalar),
                  Matrix.Column(-k[2], near + far),
-                 Matrix.Column(0, 0, 0, near * far))
+                 Matrix.Column(0.0 as Scalar, 0.0 as Scalar, 0.0 as Scalar, near * far))
+    }
+
+
+
+    // MARK: Decomposition
+
+    /// - Returns: Translation, rotation, shear and scale components of given *matrix*.
+    ///
+    /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    ///
+    /// See: ``decompose()``.
+    @inlinable
+    public static func decompose(_ matrix: Matrix) -> (translation: Vector, rotation: Math.Matrix3x3, shear: (xy: Scalar, xz: Scalar, yz: Scalar), scale: Vector) {
+        let (rotation, shear, scale) = KvAffineTransform3<Math>.decompose(Math.make3(matrix))
+        return (translation(from: matrix), rotation, shear, scale)
+    }
+
+
+    /// - Returns: Translation, rotation, shear and scale components of the receiver.
+    ///
+    /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    ///
+    /// See: ``decompose(_:)``.
+    @inlinable
+    public func decompose() -> (translation: Vector, rotation: Math.Matrix3x3, shear: (xy: Scalar, xz: Scalar, yz: Scalar), scale: Vector) {
+        Self.decompose(matrix)
     }
 
 
@@ -452,6 +479,7 @@ public struct KvTransform3<Math : KvMathScope> {
     /// Scale component of the receiver.
     ///
     /// - Warning: Assuming bottom row of the matrix is `[ 0, 0, 0, 1 ]`.
+    /// - Warning: Assuming the receiver has no shear component. Consider ``decompose()`` method to extract scale from transformations having non-trivial shear component.
     /// - Note: If determinant of the matrix is negative then X scale element is negative and other elements are non-negative.
     @inlinable public var scale: Vector { KvTransform3.scale(from: matrix) }
 
@@ -753,7 +781,7 @@ extension KvTransform3 {
         @inlinable
         public static func orthogonalized(vectors v: (Vector, Vector, Vector)) -> (Vector, Vector, Vector) {
             let v0 = v.0
-            let l0⁻² = 1 / Math.length²(v0)
+            let l0⁻² = (1.0 as Scalar) / Math.length²(v0)
 
             let v1 = v.1 - v0 * (Math.dot(v0, v.1) * l0⁻²)
             var v2 = v.2 - v0 * (Math.dot(v0, v.2) * l0⁻²)
@@ -772,7 +800,7 @@ extension KvTransform3 {
 
             guard KvIsNonzero(l0²) else { return nil }
 
-            let l0⁻² = 1 / l0²
+            let l0⁻² = (1.0 as Scalar) / l0²
 
             let v1 = v.1 - v0 * (Math.dot(v0, v.1) * l0⁻²)
             let l1² = Math.length²(v1)
@@ -896,7 +924,7 @@ extension KvTransform3 {
         /// Matrix representation of the receiver.
         ///
         /// See: ``transform``.
-        @inlinable public var matrix: Matrix { Matrix(Math.make4(x), Math.make4(y), Math.make4(z), Matrix.Column(origin, 1)) }
+        @inlinable public var matrix: Matrix { Matrix(Math.make4(x), Math.make4(y), Math.make4(z), Matrix.Column(origin, 1.0 as Scalar)) }
 
         /// *KvTransform2* representation of the receiver.
         ///

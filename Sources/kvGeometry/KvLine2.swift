@@ -16,7 +16,7 @@
 //===----------------------------------------------------------------------===//
 //
 //  KvLine2.swift
-//  kvKit
+//  kvGeometry
 //
 //  Created by Svyatoslav Popov on 21.09.2022.
 //
@@ -157,7 +157,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func y(x: Scalar) -> Scalar? {
         guard KvIsNonzero(normal.y) else { return nil }
 
-        return -(c + normal.x * x) as Scalar / normal.y
+        return (-(c + normal.x * x)) as Scalar / normal.y
     }
 
     /// - Returns: X coodinate where horizontal line at *y* intersects the receiver.
@@ -165,7 +165,7 @@ public struct KvLine2<Math : KvMathScope> {
     public func x(y: Scalar) -> Scalar? {
         guard KvIsNonzero(normal.x) else { return nil }
 
-        return -(c + normal.y * y) as Scalar / normal.x
+        return (-(c + normal.y * y)) as Scalar / normal.x
     }
 
 
@@ -282,6 +282,8 @@ public struct KvLine2<Math : KvMathScope> {
         return normalized()
     }
 
+
+    // MARK: Transformations
 
     /// Translates all the receiver's ponts by *offset*.
     ///
