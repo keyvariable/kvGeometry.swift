@@ -67,7 +67,13 @@ public struct KvViewingFrustum<Math : KvMathScope> {
         top = Plane(abcd: m[3] - m[1])
 
         near = Plane(abcd: m[3] + m[2])
-        far = Plane(abcd: m[3] - m[2])
+        do {
+            let far = Plane(abcd: m[3] - m[2])
+
+            self.far = (!far.isDegenerate
+                        ? far
+                        : Plane(normal: -near.normal, d: near.d < (0.0 as Scalar) ? Scalar.infinity : -Scalar.infinity))
+        }
     }
 
 
