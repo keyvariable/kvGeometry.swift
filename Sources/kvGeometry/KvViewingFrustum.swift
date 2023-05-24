@@ -188,12 +188,12 @@ public struct KvViewingFrustum<Math : KvMathScope> {
     /// - Returns: A copy of the receiver where planes are shifted by given offset.
     @inlinable
     public func inset(by d: Scalar) -> Self {
-        .init(left: left.translated(by: left.normal * d),
-              right: right.translated(by: right.normal * d),
-              bottom: bottom.translated(by: bottom.normal * d),
-              top: top.translated(by: top.normal * d),
-              near: near.translated(by: near.normal * d),
-              far: far.translated(by: far.normal * d))
+        .init(left: left.translated(by: d),
+              right: right.translated(by: d),
+              bottom: bottom.translated(by: d),
+              top: top.translated(by: d),
+              near: near.translated(by: d),
+              far: far.translated(by: d))
     }
 
 }
