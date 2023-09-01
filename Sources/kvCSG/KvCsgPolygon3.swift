@@ -22,7 +22,6 @@
 //
 
 import kvKit
-import simd
 
 import kvGeometry
 

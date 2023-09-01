@@ -21,8 +21,6 @@
 //  Created by Svyatoslav Popov on 19.09.2022.
 //
 
-import simd
-
 import kvKit
 
 

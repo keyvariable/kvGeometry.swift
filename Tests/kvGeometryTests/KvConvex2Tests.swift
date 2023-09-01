@@ -25,8 +25,6 @@ import XCTest
 
 @testable import kvGeometry
 
-import simd
-
 import kvKit
 import kvTestKit
 

@@ -2,7 +2,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  Copyright (c) 2021 Svyatoslav Popov.
+//  Copyright (c) 2021 Svyatoslav Popov (info@keyvar.com).
 //
 //  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 //  the License. You may obtain a copy of the License at
@@ -35,7 +35,7 @@ let package = Package(
     ],
 
     dependencies: [
-        .package(url: "https://github.com/keyvariable/kvKit.swift.git", from: "4.0.0"),
+        .package(url: "https://github.com/keyvariable/kvKit.swift.git", from: "4.2.0"),
     ],
 
     targets: [

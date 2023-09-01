@@ -6,8 +6,17 @@
         "repositoryURL": "https://github.com/keyvariable/kvKit.swift.git",
         "state": {
           "branch": null,
-          "revision": "d8095d6f9ce8c96d66d857cf836ed3190e7c3533",
-          "version": "4.0.0"
+          "revision": "181cdf56d1a55dc94932d53f3e09ba497fc2ce16",
+          "version": "4.2.0"
+        }
+      },
+      {
+        "package": "kvSIMD.swift",
+        "repositoryURL": "https://github.com/keyvariable/kvSIMD.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "ae96f63ed309c30e9dd2459cb1a22b994e61546f",
+          "version": "1.0.1"
         }
       }
     ]
