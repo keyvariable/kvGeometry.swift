@@ -1,15 +1,18 @@
 # kvGeometry.swift
 
-A collection of geometry auxiliaries on Swift. For example:
+A cross-platform collection of geometry auxiliaries on Swift. For example:
 
 - Basic shapes.
 - Basic CSG (Constructive Solid Geometry).
 - Numerical tolerance handling.
 
+Handling of numerical tolerance helps to obtain more stable results.
+For example, in the kvCSG package, it helps to reduce the number of extra vertices and polygons in resulting geometry.
+
 
 ## Supported Platforms
 
-This package is completely cross-platform.
+This package contains no platform-dependent code.
 
 
 ## Getting Started
