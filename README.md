@@ -13,13 +13,14 @@ For example, in the kvCSG package, it helps to reduce the number of extra vertic
 ## Supported Platforms
 
 This package contains no platform-dependent code.
+Package is built and the unit-tests are passed on macOS, Linux (Ubuntu 22.04) and Windows (10 x64).
 
 
 ## Getting Started
 
 #### Package Dependencies:
 ```swift
-.package(url: "https://github.com/keyvariable/kvGeometry.swift.git", from: "0.2.1")
+.package(url: "https://github.com/keyvariable/kvGeometry.swift.git", from: "0.2.2")
 ```
 #### Target Dependencies:
 ```swift
